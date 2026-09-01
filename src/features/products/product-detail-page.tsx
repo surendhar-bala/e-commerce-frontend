@@ -83,7 +83,7 @@ export function ProductDetailPage({ productId }: ProductDetailPageProps) {
   if (status === 'loading') {
     return (
       <div className="container-page grid gap-10 py-10 md:grid-cols-2">
-        <Skeleton className="aspect-[4/5] w-full rounded-2xl" />
+        <Skeleton className="aspect-square w-full rounded-2xl" />
         <div className="space-y-4">
           <Skeleton className="h-4 w-24" />
           <Skeleton className="h-10 w-3/4" />
@@ -165,7 +165,7 @@ export function ProductDetailPage({ productId }: ProductDetailPageProps) {
             </Button>
           </div>
           <p className="mt-4 text-xs text-muted-foreground">
-            {product.stock > 8 ? 'In stock · ships in 2–4 days' : `${product.stock} remaining`}
+            {product.stock > 8 ? 'In stock · usually delivers in 2–5 days' : `${product.stock} left`}
           </p>
         </div>
       </div>

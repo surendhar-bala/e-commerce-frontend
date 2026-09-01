@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -10,6 +10,9 @@ import { Input } from '@/components/ui/input'
 import { useDocumentTitle } from '@/hooks/use-document-title'
 import { authService } from '@/services'
 import { ServiceError } from '@/services/http'
+import { useAuthStore } from '@/store/auth-store'
+import { UserRole } from '@/types/user'
+import { toast } from 'sonner'
 import { useState } from 'react'
 
 const schema = z.object({
@@ -22,6 +25,8 @@ type Values = z.infer<typeof schema>
 
 export function LoginPage() {
   useDocumentTitle('Sign in')
+  const navigate = useNavigate()
+  const setSession = useAuthStore((state) => state.setSession)
   const [serverError, setServerError] = useState<string | null>(null)
   const form = useForm<Values>({
     resolver: zodResolver(schema),
@@ -32,7 +37,7 @@ export function LoginPage() {
     <div>
       <p className="text-caption">Welcome back</p>
       <h1 className="text-page mt-2">Sign in</h1>
-      <p className="mt-2 text-small">Use your email to continue. Accounts connect when the API is live.</p>
+      <p className="mt-2 text-small">Use the email and password from your account.</p>
       {serverError ? (
         <Alert variant="info" className="mt-6">
           <AlertDescription>{serverError}</AlertDescription>
@@ -44,12 +49,15 @@ export function LoginPage() {
           onSubmit={form.handleSubmit(async (values) => {
             setServerError(null)
             try {
-              await authService.login(values)
+              const session = await authService.login(values)
+              setSession(session.user)
+              toast.success(`Signed in as ${session.user.name}.`)
+              await navigate({
+                to: session.user.role === UserRole.Seller ? '/seller' : session.user.role === UserRole.Admin ? '/admin' : '/',
+              })
             } catch (error) {
               setServerError(
-                error instanceof ServiceError
-                  ? error.message
-                  : 'Unable to sign in right now.',
+                error instanceof ServiceError ? error.message : 'Unable to sign in right now.',
               )
             }
           })}

@@ -51,18 +51,18 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
-              <Link to="/products" search={{ category: 'cat-apparel' }} className="hover:text-accent">
-                Apparel
+              <Link to="/products" search={{ category: 'cat-art' }} className="hover:text-accent">
+                Painting materials
               </Link>
             </li>
             <li>
-              <Link to="/products" search={{ category: 'cat-home' }} className="hover:text-accent">
-                Home
+              <Link to="/products" search={{ category: 'cat-toys' }} className="hover:text-accent">
+                Kids toys
               </Link>
             </li>
             <li>
-              <Link to="/cart" className="hover:text-accent">
-                Cart
+              <Link to="/products" search={{ category: 'cat-everyday' }} className="hover:text-accent">
+                Everyday products
               </Link>
             </li>
           </ul>
@@ -93,12 +93,22 @@ export function SiteFooter() {
           </ul>
         </div>
         <div>
-          <p className="text-caption text-background/50">Studio</p>
+          <p className="text-caption text-background/50">Help</p>
           <ul className="mt-4 space-y-2.5 text-sm">
             <li>
               <a href={`mailto:${BRAND.supportEmail}`} className="hover:text-accent">
                 {BRAND.supportEmail}
               </a>
+            </li>
+            <li>
+              <Link to="/register" search={{ as: 'seller' }} className="hover:text-accent">
+                Sell on Velora
+              </Link>
+            </li>
+            <li>
+              <Link to="/seller" className="hover:text-accent">
+                Seller hub
+              </Link>
             </li>
             <li>
               <Link to="/admin" className="hover:text-accent">
@@ -111,7 +121,7 @@ export function SiteFooter() {
       <div className="border-t border-background/10">
         <div className="container-page flex flex-col gap-2 py-5 text-xs text-background/50 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} {BRAND.name}. All rights reserved.</p>
-          <p>Complimentary shipping over $150 · 30-day returns</p>
+          <p>Free delivery over ₹499 · 7-day returns · COD available</p>
         </div>
       </div>
     </footer>

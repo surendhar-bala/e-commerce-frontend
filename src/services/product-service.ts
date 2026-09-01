@@ -1,4 +1,4 @@
-import type { PaginatedProducts, Product, ProductCategory, ProductFilters } from '@/types/product'
+import type { PaginatedProducts, Product, ProductCategory, ProductFilters, ProductStatus } from '@/types/product'
 
 export type ProductDraft = {
   name: string
@@ -8,6 +8,9 @@ export type ProductDraft = {
   compareAtPrice?: number
   stock: number
   imageUrl?: string
+  imageUrls?: string[]
+  sellerId?: string
+  status?: ProductStatus
 }
 
 export type ProductService = {
@@ -18,4 +21,5 @@ export type ProductService = {
   getRelated: (productId: string) => Promise<Product[]>
   create: (draft: ProductDraft) => Promise<Product>
   update: (id: string, draft: ProductDraft) => Promise<Product>
+  remove: (id: string) => Promise<void>
 }

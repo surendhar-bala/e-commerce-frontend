@@ -24,3 +24,12 @@ export function requireAdmin(auth: GuardAuth) {
     throw redirect({ to: '/login' })
   }
 }
+
+export function requireSeller(auth: GuardAuth) {
+  if (!env.enforceRouteGuards) {
+    return
+  }
+  if (!auth.isAuthenticated || (auth.role !== 'seller' && auth.role !== 'admin')) {
+    throw redirect({ to: '/login' })
+  }
+}

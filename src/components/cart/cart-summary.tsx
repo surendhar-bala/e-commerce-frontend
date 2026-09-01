@@ -27,10 +27,10 @@ export function CartSummaryCard({ items }: CartSummaryCardProps) {
         </div>
         <div className="flex justify-between">
           <dt className="text-muted-foreground">Shipping</dt>
-          <dd>{summary.shipping === 0 ? 'Complimentary' : formatCurrency(summary.shipping)}</dd>
+          <dd>{summary.shipping === 0 ? 'Free' : formatCurrency(summary.shipping)}</dd>
         </div>
         <div className="flex justify-between">
-          <dt className="text-muted-foreground">Estimated tax</dt>
+          <dt className="text-muted-foreground">GST (18%)</dt>
           <dd>{formatCurrency(summary.tax)}</dd>
         </div>
       </dl>
@@ -41,7 +41,7 @@ export function CartSummaryCard({ items }: CartSummaryCardProps) {
       </div>
       {summary.subtotal < SHIPPING_THRESHOLD && summary.subtotal > 0 ? (
         <p className="mt-3 text-xs text-muted-foreground">
-          Add {formatCurrency(SHIPPING_THRESHOLD - summary.subtotal)} for complimentary shipping.
+          Add {formatCurrency(SHIPPING_THRESHOLD - summary.subtotal)} more for free delivery.
         </p>
       ) : null}
       <Button asChild className="mt-6 w-full" size="lg">

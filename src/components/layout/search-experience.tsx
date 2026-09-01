@@ -53,7 +53,7 @@ export function SearchExperience({
         id={compact ? 'mobile-search' : 'desktop-search'}
         value={query}
         autoFocus={autoFocus}
-        placeholder="Search linen, scent, leather…"
+        placeholder="Search paints, toys, tiffin…"
         className={cn('pr-10 pl-10', compact ? 'h-12' : 'h-11 bg-background/80')}
         onFocus={() => setOpen(true)}
         onChange={(event) => {

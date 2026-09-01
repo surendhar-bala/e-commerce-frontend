@@ -4,6 +4,7 @@ import { ErrorState } from '@/components/common/error-state'
 import { AdminLayout } from '@/components/layout/admin-layout'
 import { AuthLayout } from '@/components/layout/auth-layout'
 import { CheckoutLayout } from '@/components/layout/checkout-layout'
+import { SellerLayout } from '@/components/layout/seller-layout'
 import { StorefrontLayout } from '@/components/layout/storefront-layout'
 import { ThemeProvider } from '@/components/layout/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
@@ -13,6 +14,7 @@ const AUTH_PATHS = ['/login', '/register', '/forgot-password', '/reset-password'
 function RootComponent() {
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   const isAdmin = pathname.startsWith('/admin')
+  const isSeller = pathname.startsWith('/seller')
   const isAuth = AUTH_PATHS.includes(pathname)
   const isCheckout = pathname === '/checkout'
 
@@ -27,6 +29,12 @@ function RootComponent() {
       <AdminLayout>
         <Outlet />
       </AdminLayout>
+    )
+  } else if (isSeller) {
+    content = (
+      <SellerLayout>
+        <Outlet />
+      </SellerLayout>
     )
   } else if (isAuth) {
     content = (

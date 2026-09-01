@@ -1,12 +1,13 @@
 export const BRAND = {
   name: 'Velora',
-  tagline: 'Curated for a considered life.',
-  supportEmail: 'hello@velora.studio',
+  tagline: 'Paints, toys, and daily essentials for Indian homes.',
+  supportEmail: 'hello@velora.in',
 } as const
 
-export const SHIPPING_THRESHOLD = 150
-export const STANDARD_SHIPPING = 12
-export const TAX_RATE = 0.08
+export const SHIPPING_THRESHOLD = 499
+export const STANDARD_SHIPPING = 49
+export const TAX_RATE = 0.18
+export const PRICE_FILTER_MAX = 2500
 
 export const PAGE_SIZE = 12
 

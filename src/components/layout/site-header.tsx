@@ -26,6 +26,9 @@ export function SiteHeader() {
   const [searchOpen, setSearchOpen] = useState(false)
   const itemCount = useCartStore((state) => state.items.reduce((sum, item) => sum + item.quantity, 0))
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const role = useAuthStore((state) => state.role)
+  const user = useAuthStore((state) => state.user)
+  const clearSession = useAuthStore((state) => state.clearSession)
 
   useEffect(() => {
     const onScroll = () => setCompact(window.scrollY > 16)
@@ -58,8 +61,17 @@ export function SiteHeader() {
 
           <nav className="ml-8 hidden items-center gap-6 lg:flex" aria-label="Primary">
             <Link to="/products" className="text-sm transition-colors hover:text-primary">
-              Products
+              Shop
             </Link>
+            {role === 'seller' || role === 'admin' ? (
+              <Link to="/seller" className="text-sm transition-colors hover:text-primary">
+                Sell
+              </Link>
+            ) : (
+              <Link to="/register" search={{ as: 'seller' }} className="text-sm transition-colors hover:text-primary">
+                Sell
+              </Link>
+            )}
             {categories.map((category) => (
               <Link
                 key={category.id}
@@ -121,11 +133,33 @@ export function SiteHeader() {
                 <DropdownMenuSeparator />
                 {isAuthenticated ? (
                   <>
+                    {user?.name ? <DropdownMenuLabel className="font-normal text-muted-foreground">{user.name}</DropdownMenuLabel> : null}
                     <DropdownMenuItem asChild>
                       <Link to="/orders">Orders</Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/admin">Admin</Link>
+                    {role === 'seller' || role === 'admin' ? (
+                      <DropdownMenuItem asChild>
+                        <Link to="/seller">Seller hub</Link>
+                      </DropdownMenuItem>
+                    ) : (
+                      <DropdownMenuItem asChild>
+                        <Link to="/register" search={{ as: 'seller' }}>
+                          Become a seller
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                    {role === 'admin' ? (
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin">Admin</Link>
+                      </DropdownMenuItem>
+                    ) : null}
+                    <DropdownMenuItem
+                      onSelect={() => {
+                        clearSession()
+                        toast.success('Signed out.')
+                      }}
+                    >
+                      Sign out
                     </DropdownMenuItem>
                   </>
                 ) : (
@@ -135,6 +169,11 @@ export function SiteHeader() {
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/register">Create account</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/register" search={{ as: 'seller' }}>
+                        Sell on Velora
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/orders">Orders</Link>
@@ -169,8 +208,25 @@ export function SiteHeader() {
                 {category.name}
               </Link>
             ))}
+            {role === 'seller' || role === 'admin' ? (
+              <Link to="/seller" className="text-lg" onClick={() => setMobileOpen(false)}>
+                Sell
+              </Link>
+            ) : (
+              <Link
+                to="/register"
+                search={{ as: 'seller' }}
+                className="text-lg"
+                onClick={() => setMobileOpen(false)}
+              >
+                Sell
+              </Link>
+            )}
             <Link to="/login" className="text-lg" onClick={() => setMobileOpen(false)}>
               Sign in
+            </Link>
+            <Link to="/register" className="text-lg" onClick={() => setMobileOpen(false)}>
+              Create account
             </Link>
             <Link to="/orders" className="text-lg" onClick={() => setMobileOpen(false)}>
               Orders

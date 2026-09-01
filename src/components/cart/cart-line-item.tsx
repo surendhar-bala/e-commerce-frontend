@@ -18,7 +18,7 @@ export function CartLineItem({ item }: CartLineItemProps) {
       <img
         src={`${item.imageUrl}?auto=format&fit=crop&w=240&q=80`}
         alt={item.imageAlt}
-        className="aspect-[4/5] w-full rounded-lg object-cover"
+        className="aspect-square w-full rounded-lg object-cover"
       />
       <div className="min-w-0">
         <h3 className="text-product-title">{item.name}</h3>

@@ -16,8 +16,8 @@ export function getCartSummary(items: CartItem[]): CartSummary {
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const shipping = subtotal === 0 || subtotal >= SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING
   const discount = 0
-  const tax = Number((subtotal * TAX_RATE).toFixed(2))
-  const total = Number((subtotal - discount + shipping + tax).toFixed(2))
+  const tax = Math.round(subtotal * TAX_RATE)
+  const total = Math.round(subtotal - discount + shipping + tax)
 
   return { subtotal, discount, shipping, tax, total }
 }
@@ -73,7 +73,7 @@ export const useCartStore = create<CartState>()(
       clear: () => set({ items: [] }),
     }),
     {
-      name: 'velora-cart',
+      name: 'velora-cart-inr',
     },
   ),
 )

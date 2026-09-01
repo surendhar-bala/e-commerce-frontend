@@ -38,6 +38,7 @@ export type Product = {
   featured: boolean
   trending: boolean
   createdAt: string
+  sellerId?: string
   media: ProductMedia[]
   specifications: Array<{ label: string; value: string }>
 }
@@ -50,6 +51,9 @@ export type ProductFilters = {
   sort?: 'featured' | 'newest' | 'price-asc' | 'price-desc'
   page?: number
   pageSize?: number
+  sellerId?: string
+  sellerOnly?: boolean
+  includeInactive?: boolean
 }
 
 export type PaginatedProducts = {

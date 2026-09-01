@@ -17,14 +17,19 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SellerRouteRouteImport } from './routes/seller/route'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as OrdersIndexRouteImport } from './routes/orders/index'
 import { Route as OrdersOrderIdRouteImport } from './routes/orders/$orderId'
 import { Route as ProductsIndexRouteImport } from './routes/products/index'
 import { Route as ProductsProductIdRouteImport } from './routes/products/$productId'
+import { Route as SellerIndexRouteImport } from './routes/seller/index'
 import { Route as AdminProductsIndexRouteImport } from './routes/admin/products/index'
 import { Route as AdminProductsCreateRouteImport } from './routes/admin/products/create'
+import { Route as SellerProductsIndexRouteImport } from './routes/seller/products/index'
+import { Route as SellerProductsCreateRouteImport } from './routes/seller/products/create'
 import { Route as AdminProductsProductIdEditRouteImport } from './routes/admin/products/$productId/edit'
+import { Route as SellerProductsProductIdEditRouteImport } from './routes/seller/products/$productId/edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -66,6 +71,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SellerRouteRoute = SellerRouteRouteImport.update({
+  id: '/seller',
+  path: '/seller',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -91,6 +101,11 @@ const ProductsProductIdRoute = ProductsProductIdRouteImport.update({
   path: '/products/$productId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SellerIndexRoute = SellerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SellerRouteRoute,
+} as any)
 const AdminProductsIndexRoute = AdminProductsIndexRouteImport.update({
   id: '/products/',
   path: '/products/',
@@ -101,16 +116,33 @@ const AdminProductsCreateRoute = AdminProductsCreateRouteImport.update({
   path: '/products/create',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const SellerProductsIndexRoute = SellerProductsIndexRouteImport.update({
+  id: '/products/',
+  path: '/products/',
+  getParentRoute: () => SellerRouteRoute,
+} as any)
+const SellerProductsCreateRoute = SellerProductsCreateRouteImport.update({
+  id: '/products/create',
+  path: '/products/create',
+  getParentRoute: () => SellerRouteRoute,
+} as any)
 const AdminProductsProductIdEditRoute =
   AdminProductsProductIdEditRouteImport.update({
     id: '/products/$productId/edit',
     path: '/products/$productId/edit',
     getParentRoute: () => AdminRouteRoute,
   } as any)
+const SellerProductsProductIdEditRoute =
+  SellerProductsProductIdEditRouteImport.update({
+    id: '/products/$productId/edit',
+    path: '/products/$productId/edit',
+    getParentRoute: () => SellerRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/seller': typeof SellerRouteRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -122,9 +154,13 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/orders/': typeof OrdersIndexRoute
   '/products/': typeof ProductsIndexRoute
+  '/seller/': typeof SellerIndexRoute
   '/admin/products/create': typeof AdminProductsCreateRoute
+  '/seller/products/create': typeof SellerProductsCreateRoute
   '/admin/products/': typeof AdminProductsIndexRoute
+  '/seller/products/': typeof SellerProductsIndexRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
+  '/seller/products/$productId/edit': typeof SellerProductsProductIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -139,14 +175,19 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/orders': typeof OrdersIndexRoute
   '/products': typeof ProductsIndexRoute
+  '/seller': typeof SellerIndexRoute
   '/admin/products/create': typeof AdminProductsCreateRoute
+  '/seller/products/create': typeof SellerProductsCreateRoute
   '/admin/products': typeof AdminProductsIndexRoute
+  '/seller/products': typeof SellerProductsIndexRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
+  '/seller/products/$productId/edit': typeof SellerProductsProductIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/seller': typeof SellerRouteRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -158,15 +199,20 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/orders/': typeof OrdersIndexRoute
   '/products/': typeof ProductsIndexRoute
+  '/seller/': typeof SellerIndexRoute
   '/admin/products/create': typeof AdminProductsCreateRoute
+  '/seller/products/create': typeof SellerProductsCreateRoute
   '/admin/products/': typeof AdminProductsIndexRoute
+  '/seller/products/': typeof SellerProductsIndexRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
+  '/seller/products/$productId/edit': typeof SellerProductsProductIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/admin'
+    | '/seller'
     | '/cart'
     | '/checkout'
     | '/forgot-password'
@@ -178,9 +224,13 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/orders/'
     | '/products/'
+    | '/seller/'
     | '/admin/products/create'
+    | '/seller/products/create'
     | '/admin/products/'
+    | '/seller/products/'
     | '/admin/products/$productId/edit'
+    | '/seller/products/$productId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -195,13 +245,18 @@ export interface FileRouteTypes {
     | '/admin'
     | '/orders'
     | '/products'
+    | '/seller'
     | '/admin/products/create'
+    | '/seller/products/create'
     | '/admin/products'
+    | '/seller/products'
     | '/admin/products/$productId/edit'
+    | '/seller/products/$productId/edit'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/seller'
     | '/cart'
     | '/checkout'
     | '/forgot-password'
@@ -213,14 +268,19 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/orders/'
     | '/products/'
+    | '/seller/'
     | '/admin/products/create'
+    | '/seller/products/create'
     | '/admin/products/'
+    | '/seller/products/'
     | '/admin/products/$productId/edit'
+    | '/seller/products/$productId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  SellerRouteRoute: typeof SellerRouteRouteWithChildren
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -291,6 +351,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/seller': {
+      id: '/seller'
+      path: '/seller'
+      fullPath: '/seller'
+      preLoaderRoute: typeof SellerRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
@@ -326,6 +393,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsProductIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/seller/': {
+      id: '/seller/'
+      path: '/'
+      fullPath: '/seller/'
+      preLoaderRoute: typeof SellerIndexRouteImport
+      parentRoute: typeof SellerRouteRoute
+    }
     '/admin/products/': {
       id: '/admin/products/'
       path: '/products'
@@ -340,12 +414,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProductsCreateRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/seller/products/': {
+      id: '/seller/products/'
+      path: '/products'
+      fullPath: '/seller/products/'
+      preLoaderRoute: typeof SellerProductsIndexRouteImport
+      parentRoute: typeof SellerRouteRoute
+    }
+    '/seller/products/create': {
+      id: '/seller/products/create'
+      path: '/products/create'
+      fullPath: '/seller/products/create'
+      preLoaderRoute: typeof SellerProductsCreateRouteImport
+      parentRoute: typeof SellerRouteRoute
+    }
     '/admin/products/$productId/edit': {
       id: '/admin/products/$productId/edit'
       path: '/products/$productId/edit'
       fullPath: '/admin/products/$productId/edit'
       preLoaderRoute: typeof AdminProductsProductIdEditRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    '/seller/products/$productId/edit': {
+      id: '/seller/products/$productId/edit'
+      path: '/products/$productId/edit'
+      fullPath: '/seller/products/$productId/edit'
+      preLoaderRoute: typeof SellerProductsProductIdEditRouteImport
+      parentRoute: typeof SellerRouteRoute
     }
   }
 }
@@ -368,9 +463,28 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
   AdminRouteRouteChildren,
 )
 
+interface SellerRouteRouteChildren {
+  SellerIndexRoute: typeof SellerIndexRoute
+  SellerProductsCreateRoute: typeof SellerProductsCreateRoute
+  SellerProductsIndexRoute: typeof SellerProductsIndexRoute
+  SellerProductsProductIdEditRoute: typeof SellerProductsProductIdEditRoute
+}
+
+const SellerRouteRouteChildren: SellerRouteRouteChildren = {
+  SellerIndexRoute: SellerIndexRoute,
+  SellerProductsCreateRoute: SellerProductsCreateRoute,
+  SellerProductsIndexRoute: SellerProductsIndexRoute,
+  SellerProductsProductIdEditRoute: SellerProductsProductIdEditRoute,
+}
+
+const SellerRouteRouteWithChildren = SellerRouteRoute._addFileChildren(
+  SellerRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  SellerRouteRoute: SellerRouteRouteWithChildren,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,

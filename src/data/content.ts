@@ -1,27 +1,27 @@
 export const trustStats = [
-  { label: 'Orders fulfilled', value: '48k+' },
-  { label: 'Average rating', value: '4.8' },
-  { label: 'Complimentary returns', value: '30 days' },
-  { label: 'Carbon-neutral shipping', value: 'Always' },
+  { label: 'Orders delivered', value: '4 lakh+' },
+  { label: 'Average rating', value: '4.7' },
+  { label: 'Easy returns', value: '7 days' },
+  { label: 'Cash on delivery', value: 'Available' },
 ] as const
 
 export const reasons = [
   {
-    title: 'Considered materials',
-    description: 'Natural fibers, responsible tanneries, and objects made to be repaired, not replaced.',
+    title: 'For Indian homes',
+    description: 'Paints for class, toys for the kids, and daily kitchen and cleaning staples — not fashion, not imports.',
   },
   {
-    title: 'Quiet luxury',
-    description: 'No logos, no noise. Pieces chosen for cut, hand-feel, and how they live in a real wardrobe.',
+    title: 'Fair rupee prices',
+    description: 'What you see is ₹, GST, and a price that makes sense for a household cart, not a boutique bill.',
   },
   {
-    title: 'Thoughtful delivery',
-    description: 'Carbon-neutral shipping, plastic-free packaging, and complimentary returns within 30 days.',
+    title: 'Pan-India delivery',
+    description: 'Free delivery above ₹499, easy 7-day returns, and cash on delivery on most pin codes.',
   },
   {
-    title: 'Human support',
-    description: 'Styling questions, fit advice, and order care from a small studio team — not a chatbot maze.',
+    title: 'Real support',
+    description: 'Wrong size canvas or a missing mop head? Message us on WhatsApp-friendly hours — a person replies.',
   },
 ] as const
 
-export const recentSearchSeeds = ['linen shirt', 'sandalwood', 'leather tote', 'brass lamp']
+export const recentSearchSeeds = ['acrylic paints', 'wooden blocks', 'steel tiffin', 'watercolour']

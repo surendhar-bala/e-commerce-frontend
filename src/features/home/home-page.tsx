@@ -19,25 +19,25 @@ export function HomePage() {
     <div>
       <section className="relative isolate min-h-[78vh] overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=2000&q=80"
-          alt="Editorial portrait in a linen shirt beside a sunlit interior"
+          src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=2000&q=80"
+          alt="Paint tubes and brushes on a wooden table"
           className="absolute inset-0 size-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-foreground/75 via-foreground/35 to-transparent" />
         <div className="container-page relative flex min-h-[78vh] items-end pb-16 pt-28 md:items-center md:py-24">
           <div className="max-w-xl text-background">
-            <p className="text-caption text-background/70">Spring studio edit</p>
-            <h1 className="text-display mt-4">Pieces that stay. Rooms that breathe.</h1>
+            <p className="text-caption text-background/70">Paints · Toys · Daily essentials</p>
+            <h1 className="text-display mt-4">For the house, the kids, and the art table.</h1>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-background/80 sm:text-base">
-              Apparel, home, and fragrance chosen for material, cut, and how they live — not how they trend.
+              Painting materials, kids’ toys, and everyday products — priced in ₹ and delivered to your pin code. Clothing is not on the shelf yet.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg">
-                <Link to="/products">Shop the collection</Link>
+                <Link to="/products">Shop now</Link>
               </Button>
               <Button asChild size="lg" variant="secondary">
-                <Link to="/products" search={{ category: 'cat-home' }}>
-                  Explore home
+                <Link to="/products" search={{ category: 'cat-art' }}>
+                  Painting materials
                 </Link>
               </Button>
             </div>
@@ -47,23 +47,17 @@ export function HomePage() {
 
       <section className="container-page py-16 md:py-24">
         <SectionHeading
-          eyebrow="The house"
-          title="Shop by atmosphere"
-          description="Four rooms of the store — each edited with the same restraint."
+          eyebrow="Categories"
+          title="Shop by aisle"
+          description="Painting materials, kids’ toys, and everyday products — the three things we sell today."
         />
-        <div className="mt-10 grid gap-4 md:grid-cols-12">
-          {categories.map((category, index) => (
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
+          {categories.map((category) => (
             <Link
               key={category.id}
               to="/products"
               search={{ category: category.id }}
-              className={
-                index === 0
-                  ? 'group relative min-h-72 overflow-hidden rounded-2xl md:col-span-7 md:min-h-[22rem]'
-                  : index === 1
-                    ? 'group relative min-h-72 overflow-hidden rounded-2xl md:col-span-5'
-                    : 'group relative min-h-64 overflow-hidden rounded-2xl md:col-span-6'
-              }
+              className="group relative min-h-72 overflow-hidden rounded-2xl md:min-h-[22rem]"
             >
               <img
                 src={getMediaUrl(category.image, 1100)}
@@ -82,7 +76,7 @@ export function HomePage() {
 
       <section className="container-page pb-16 md:pb-24">
         <div className="mb-8 flex items-end justify-between gap-4">
-          <SectionHeading eyebrow="Featured" title="The studio edit" />
+          <SectionHeading eyebrow="Featured" title="Useful this week" />
           <Button asChild variant="ghost">
             <Link to="/products">
               View all <ArrowRight />
@@ -102,7 +96,7 @@ export function HomePage() {
 
       <section className="bg-secondary/60 py-16 md:py-24">
         <div className="container-page">
-          <SectionHeading eyebrow="Trending" title="What people are taking home" />
+          <SectionHeading eyebrow="Trending" title="Going fast in Indian homes" />
           <div className="mt-10 flex gap-5 overflow-x-auto pb-2 snap-x">
             {trending.map((product) => {
               const image = product.media[0]
@@ -117,7 +111,7 @@ export function HomePage() {
                     <img
                       src={getMediaUrl(image, 480)}
                       alt={image.alt}
-                      className="aspect-[4/5] w-full rounded-xl object-cover"
+                      className="aspect-square w-full rounded-xl object-cover"
                       loading="lazy"
                     />
                   ) : null}
@@ -134,19 +128,19 @@ export function HomePage() {
         <div className="overflow-hidden rounded-3xl">
           <img
             src="https://images.unsplash.com/photo-1513519245088-0e12902e35a6?auto=format&fit=crop&w=1200&q=80"
-            alt="Warm interior with a brass lamp and linen chair"
+            alt="Everyday Indian kitchen with jars and utensils"
             className="aspect-[4/5] w-full object-cover md:aspect-[5/6]"
           />
         </div>
         <div className="md:pl-6">
-          <p className="text-caption">A private sale</p>
-          <h2 className="text-section mt-3">Complimentary shipping on orders over $150.</h2>
+          <p className="text-caption">Free delivery</p>
+          <h2 className="text-section mt-3">Free shipping on orders over ₹499.</h2>
           <p className="mt-4 max-w-md text-small">
-            Plastic-free packaging, carbon-neutral delivery, and thirty days to live with a piece before you decide.
+            Add paints, a toy, and a tiffin in one cart. COD, 7-day returns, and GST on every listing — delivered across India.
           </p>
           <Button asChild className="mt-8" size="lg">
             <Link to="/products" search={{ sort: 'featured' }}>
-              Shop with complimentary shipping
+              Shop with free delivery
             </Link>
           </Button>
         </div>
@@ -174,12 +168,42 @@ export function HomePage() {
         </div>
       </section>
 
+      <section className="container-page py-16 md:py-24">
+        <div className="overflow-hidden rounded-3xl bg-card shadow-soft md:grid md:grid-cols-[1.1fr_0.9fr]">
+          <div className="p-8 md:p-12">
+            <p className="text-caption">For sellers</p>
+            <h2 className="text-section mt-3">List a product in minutes.</h2>
+            <p className="mt-4 max-w-md text-small">
+              Add photos, price, category, and stock — the same flow a marketplace seller would use. Your listing
+              appears in the shop as soon as it is live.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button asChild size="lg">
+                <Link to="/register" search={{ as: 'seller' }}>
+                  Create a seller account
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <Link to="/seller">Open seller hub</Link>
+              </Button>
+            </div>
+          </div>
+          <div className="relative min-h-56">
+            <img
+              src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1200&q=80"
+              alt="Seller packing household products on a wooden table"
+              className="absolute inset-0 size-full object-cover"
+            />
+          </div>
+        </div>
+      </section>
+
       <section className="bg-foreground py-16 text-background md:py-20">
         <div className="container-page max-w-2xl text-center">
-          <p className="text-caption text-background/50">The journal</p>
-          <h2 className="text-section mt-3 text-background">Studio notes, twice a month.</h2>
+          <p className="text-caption text-background/50">Newsletter</p>
+          <h2 className="text-section mt-3 text-background">Restocks and school-holiday kits.</h2>
           <p className="mt-3 text-sm text-background/70">
-            New arrivals, material stories, and the occasional private preview. No filler.
+            New colours, toy sets, and kitchen staples — no spam.
           </p>
           <form
             className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row"
@@ -196,7 +220,7 @@ export function HomePage() {
               id="home-newsletter"
               type="email"
               required
-              placeholder="you@studio.com"
+              placeholder="you@gmail.com"
               className="border-background/20 bg-background/8 text-background placeholder:text-background/50"
             />
             <Button type="submit" variant="secondary">

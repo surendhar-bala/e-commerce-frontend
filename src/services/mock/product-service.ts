@@ -1,14 +1,74 @@
 import { categories } from '@/data/categories'
 import { products as seedProducts } from '@/data/products'
 import { PAGE_SIZE } from '@/lib/constants'
+import { localStoreKeys, readLocalJson, writeLocalJson } from '@/lib/local-store'
 import { ServiceError } from '@/services/http'
 import type { ProductDraft, ProductService } from '@/services/product-service'
-import { ProductStatus, type PaginatedProducts, type Product } from '@/types/product'
+import { ProductStatus, type PaginatedProducts, type Product, type ProductMedia } from '@/types/product'
 
-const catalog: Product[] = [...seedProducts]
+function loadExtras(): Product[] {
+  return readLocalJson<Product[]>(localStoreKeys.catalogExtras, [])
+}
+
+function saveExtras(extras: Product[]) {
+  writeLocalJson(localStoreKeys.catalogExtras, extras)
+}
+
+function catalog(): Product[] {
+  const extras = loadExtras()
+  const extraIds = new Set(extras.map((product) => product.id))
+  return [...extras, ...seedProducts.filter((product) => !extraIds.has(product.id))]
+}
+
+function persistProduct(product: Product) {
+  const extras = loadExtras().filter((item) => item.id !== product.id)
+  extras.unshift(product)
+  saveExtras(extras)
+}
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+}
+
+function mediaFromDraft(draft: ProductDraft, fallbackName: string, existing?: ProductMedia[]): ProductMedia[] {
+  const urls = (draft.imageUrls ?? []).filter(Boolean)
+  if (draft.imageUrl) {
+    urls.unshift(draft.imageUrl)
+  }
+  const unique = [...new Set(urls)]
+  if (unique.length === 0) {
+    return existing?.length
+      ? existing
+      : [
+          {
+            id: crypto.randomUUID(),
+            url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8',
+            alt: fallbackName,
+          },
+        ]
+  }
+  return unique.map((url, index) => ({
+    id: existing?.[index]?.id ?? crypto.randomUUID(),
+    url,
+    alt: fallbackName,
+  }))
+}
 
 function applyFilters(items: Product[], filters: Parameters<ProductService['list']>[0] = {}): Product[] {
-  let next = items.filter((product) => product.status === ProductStatus.Active)
+  let next = items
+
+  if (filters.sellerId) {
+    next = next.filter((product) => product.sellerId === filters.sellerId)
+  } else if (filters.sellerOnly) {
+    next = next.filter((product) => Boolean(product.sellerId))
+  }
+
+  if (!filters.includeInactive) {
+    next = next.filter((product) => product.status === ProductStatus.Active)
+  }
 
   if (filters.query) {
     const query = filters.query.toLowerCase()
@@ -51,7 +111,7 @@ export const mockProductService: ProductService = {
   async list(filters = {}): Promise<PaginatedProducts> {
     const page = filters.page ?? 1
     const pageSize = filters.pageSize ?? PAGE_SIZE
-    const filtered = applyFilters(catalog, filters)
+    const filtered = applyFilters(catalog(), filters)
     const start = (page - 1) * pageSize
 
     return {
@@ -63,11 +123,11 @@ export const mockProductService: ProductService = {
   },
 
   async getById(id) {
-    return catalog.find((product) => product.id === id) ?? null
+    return catalog().find((product) => product.id === id) ?? null
   },
 
   async getBySlug(slug) {
-    return catalog.find((product) => product.slug === slug) ?? null
+    return catalog().find((product) => product.slug === slug) ?? null
   },
 
   async listCategories() {
@@ -75,11 +135,11 @@ export const mockProductService: ProductService = {
   },
 
   async getRelated(productId) {
-    const current = catalog.find((product) => product.id === productId)
+    const current = catalog().find((product) => product.id === productId)
     if (!current) {
       return []
     }
-    return catalog
+    return catalog()
       .filter((product) => product.id !== productId && product.categoryId === current.categoryId)
       .slice(0, 4)
   },
@@ -87,54 +147,52 @@ export const mockProductService: ProductService = {
   async create(draft: ProductDraft) {
     const product: Product = {
       id: `prod-${crypto.randomUUID()}`,
-      slug: draft.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      slug: slugify(draft.name) || `product-${Date.now()}`,
       name: draft.name,
       description: draft.description,
       categoryId: draft.categoryId,
       price: draft.price,
       compareAtPrice: draft.compareAtPrice,
       stock: draft.stock,
-      status: ProductStatus.Active,
+      status: draft.status ?? ProductStatus.Active,
       rating: 0,
       reviewCount: 0,
       featured: false,
       trending: false,
       createdAt: new Date().toISOString(),
-      media: [
-        {
-          id: crypto.randomUUID(),
-          url:
-            draft.imageUrl ||
-            'https://images.unsplash.com/photo-1441986300917-64674bd600d8',
-          alt: draft.name,
-        },
-      ],
+      sellerId: draft.sellerId,
+      media: mediaFromDraft(draft, draft.name),
       specifications: [],
     }
-    catalog.unshift(product)
+    persistProduct(product)
     return product
   },
 
   async update(id, draft) {
-    const index = catalog.findIndex((product) => product.id === id)
-    const existing = catalog[index]
-    if (index === -1 || !existing) {
+    const existing = catalog().find((product) => product.id === id)
+    if (!existing) {
       throw new ServiceError('Product not found', 404, 'NOT_FOUND')
     }
 
     const updated: Product = {
       ...existing,
       name: draft.name,
+      slug: slugify(draft.name) || existing.slug,
       description: draft.description,
       categoryId: draft.categoryId,
       price: draft.price,
       compareAtPrice: draft.compareAtPrice,
       stock: draft.stock,
-      media: draft.imageUrl
-        ? [{ id: existing.media[0]?.id ?? crypto.randomUUID(), url: draft.imageUrl, alt: draft.name }]
-        : existing.media,
+      status: draft.status ?? existing.status,
+      sellerId: draft.sellerId ?? existing.sellerId,
+      media: mediaFromDraft(draft, draft.name, existing.media),
     }
-    catalog[index] = updated
+    persistProduct(updated)
     return updated
+  },
+
+  async remove(id) {
+    const extras = loadExtras().filter((product) => product.id !== id)
+    saveExtras(extras)
   },
 }

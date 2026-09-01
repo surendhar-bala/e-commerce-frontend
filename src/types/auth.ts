@@ -1,4 +1,4 @@
-import type { User } from '@/types/user'
+import type { User, UserRole } from '@/types/user'
 
 export type LoginPayload = {
   email: string
@@ -9,7 +9,9 @@ export type LoginPayload = {
 export type RegisterPayload = {
   name: string
   email: string
+  phone: string
   password: string
+  role?: UserRole
 }
 
 export type AuthSession = {

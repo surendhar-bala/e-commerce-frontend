@@ -39,7 +39,7 @@ export function ProductGallery({ media, name }: ProductGalleryProps) {
         <img
           src={getMediaUrl(active, 1200)}
           alt={active.alt}
-          className="aspect-square w-full object-cover md:aspect-[4/5]"
+          className="aspect-square w-full object-cover"
         />
       </div>
     </div>

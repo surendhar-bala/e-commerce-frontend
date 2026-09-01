@@ -30,10 +30,10 @@ export function ProductCard({ product, category }: ProductCardProps) {
               src={getMediaUrl(image, 720)}
               alt={image.alt}
               loading="lazy"
-              className="aspect-[4/5] w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
-            <div className="aspect-[4/5] bg-muted" />
+            <div className="aspect-square bg-muted" />
           )}
         </Link>
         {discount > 0 ? (

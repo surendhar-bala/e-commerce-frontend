@@ -82,9 +82,9 @@ export function ProductsPage({ search }: ProductsPageProps) {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <h1 className="text-page mt-5">The collection</h1>
+      <h1 className="text-page mt-5">All products</h1>
       <p className="mt-2 max-w-xl text-small">
-        Apparel, home, accessories, and fragrance — edited weekly.
+        Painting materials, kids’ toys, and everyday products — priced in ₹. Clothing is not listed yet.
       </p>
       <div className="mt-8">
         <ProductFilters

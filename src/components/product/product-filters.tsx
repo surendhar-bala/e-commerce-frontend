@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Slider } from '@/components/ui/slider'
-import { SORT_OPTIONS } from '@/lib/constants'
+import { PRICE_FILTER_MAX, SORT_OPTIONS } from '@/lib/constants'
 import { formatCurrency } from '@/lib/format'
 import type { ProductSearch } from '@/features/products/search-schema'
 import type { ProductCategory } from '@/types/product'
@@ -15,7 +15,7 @@ type ProductFiltersProps = {
 }
 
 export function ProductFilters({ categories, search, onChange }: ProductFiltersProps) {
-  const priceRange: [number, number] = [search.minPrice ?? 0, search.maxPrice ?? 520]
+  const priceRange: [number, number] = [search.minPrice ?? 0, search.maxPrice ?? PRICE_FILTER_MAX]
 
   return (
     <div className="grid gap-4 rounded-2xl bg-card p-4 shadow-soft md:grid-cols-2 lg:grid-cols-4">
@@ -26,7 +26,7 @@ export function ProductFilters({ categories, search, onChange }: ProductFiltersP
           id="listing-search"
           className="mt-2 pl-10"
           value={search.q ?? ''}
-          placeholder="Search the collection"
+          placeholder="Search paints, toys, tiffin…"
           onChange={(event) => onChange({ ...search, q: event.target.value || undefined, page: 1 })}
         />
       </div>
@@ -81,14 +81,14 @@ export function ProductFilters({ categories, search, onChange }: ProductFiltersP
         <Slider
           className="mt-5"
           min={0}
-          max={520}
-          step={10}
+          max={PRICE_FILTER_MAX}
+          step={100}
           value={priceRange}
           onValueChange={([minPrice, maxPrice]) =>
             onChange({
               ...search,
               minPrice: minPrice === 0 ? undefined : minPrice,
-              maxPrice: maxPrice === 520 ? undefined : maxPrice,
+              maxPrice: maxPrice === PRICE_FILTER_MAX ? undefined : maxPrice,
               page: 1,
             })
           }

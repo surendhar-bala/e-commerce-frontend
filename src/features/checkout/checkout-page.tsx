@@ -21,13 +21,15 @@ import { getCartSummary, useCartStore } from '@/store/cart-store'
 const schema = z.object({
   email: z.string().email('Enter a valid email.'),
   fullName: z.string().min(2, 'Enter your full name.'),
-  line1: z.string().min(3, 'Enter a street address.'),
+  line1: z.string().min(3, 'Enter your house or street address.'),
   line2: z.string().optional(),
   city: z.string().min(2, 'Enter a city.'),
   state: z.string().min(2, 'Enter a state.'),
-  postalCode: z.string().min(3, 'Enter a postal code.'),
+  postalCode: z
+    .string()
+    .regex(/^\d{6}$/, 'Enter a 6-digit PIN code.'),
   country: z.string().min(2, 'Enter a country.'),
-  paymentMethod: z.enum(['card', 'apple-pay']),
+  paymentMethod: z.enum(['upi', 'card', 'cod']),
 })
 
 type Values = z.infer<typeof schema>
@@ -50,8 +52,8 @@ export function CheckoutPage() {
       city: '',
       state: '',
       postalCode: '',
-      country: 'United States',
-      paymentMethod: 'card',
+      country: 'India',
+      paymentMethod: 'upi',
     },
   })
 
@@ -59,10 +61,10 @@ export function CheckoutPage() {
     return (
       <EmptyState
         title="Nothing to check out"
-        description="Add a piece to your cart before continuing."
+        description="Add an item to your cart before continuing."
         action={
           <Button asChild>
-            <Link to="/products">Browse products</Link>
+            <Link to="/products">Continue shopping</Link>
           </Button>
         }
       />
@@ -107,7 +109,7 @@ export function CheckoutPage() {
                 }
                 setServerError(null)
                 try {
-                  await paymentService.createIntent(summary.total)
+                  await paymentService.createIntent(summary.total, 'INR')
                   void values
                 } catch (error) {
                   setServerError(
@@ -159,9 +161,9 @@ export function CheckoutPage() {
                         name="line1"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Address</FormLabel>
-                            <FormControl>
-                              <Input autoComplete="address-line1" {...field} />
+                            <FormLabel>House / street</FormLabel>
+                              <FormControl>
+                                <Input autoComplete="address-line1" placeholder="14, 2nd Main, Indiranagar" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -172,9 +174,9 @@ export function CheckoutPage() {
                         name="line2"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Apartment, suite</FormLabel>
-                            <FormControl>
-                              <Input autoComplete="address-line2" {...field} />
+                            <FormLabel>Landmark (optional)</FormLabel>
+                              <FormControl>
+                                <Input autoComplete="address-line2" placeholder="Near metro station" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -201,7 +203,7 @@ export function CheckoutPage() {
                             <FormItem>
                               <FormLabel>State</FormLabel>
                               <FormControl>
-                                <Input autoComplete="address-level1" {...field} />
+                                <Input autoComplete="address-level1" placeholder="Maharashtra" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -214,9 +216,9 @@ export function CheckoutPage() {
                           name="postalCode"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Postal code</FormLabel>
+                              <FormLabel>PIN code</FormLabel>
                               <FormControl>
-                                <Input autoComplete="postal-code" {...field} />
+                                <Input inputMode="numeric" autoComplete="postal-code" placeholder="560038" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -253,15 +255,21 @@ export function CheckoutPage() {
                         <FormControl>
                           <RadioGroup value={field.value} onValueChange={field.onChange}>
                             <div className="flex items-center gap-3 rounded-xl border p-4">
+                              <RadioGroupItem value="upi" id="upi" />
+                              <Label htmlFor="upi" className="font-normal">
+                                UPI
+                              </Label>
+                            </div>
+                            <div className="flex items-center gap-3 rounded-xl border p-4">
                               <RadioGroupItem value="card" id="card" />
                               <Label htmlFor="card" className="font-normal">
                                 Credit or debit card
                               </Label>
                             </div>
                             <div className="flex items-center gap-3 rounded-xl border p-4">
-                              <RadioGroupItem value="apple-pay" id="apple-pay" />
-                              <Label htmlFor="apple-pay" className="font-normal">
-                                Apple Pay / wallet
+                              <RadioGroupItem value="cod" id="cod" />
+                              <Label htmlFor="cod" className="font-normal">
+                                Cash on delivery
                               </Label>
                             </div>
                           </RadioGroup>
@@ -305,7 +313,11 @@ export function CheckoutPage() {
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Shipping</span>
-              <span>{summary.shipping === 0 ? 'Complimentary' : formatCurrency(summary.shipping)}</span>
+              <span>{summary.shipping === 0 ? 'Free' : formatCurrency(summary.shipping)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">GST (18%)</span>
+              <span>{formatCurrency(summary.tax)}</span>
             </div>
             <div className="flex justify-between font-medium">
               <span>Total</span>
