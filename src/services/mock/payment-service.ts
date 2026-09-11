@@ -5,4 +5,7 @@ export const mockPaymentService: PaymentService = {
   async createIntent() {
     throw new BackendUnavailableError('Payments')
   },
+  async verifyPayment() {
+    throw new BackendUnavailableError('Payments')
+  },
 }

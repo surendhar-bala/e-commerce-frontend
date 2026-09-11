@@ -1,3 +1,4 @@
+import { apiEndpoints } from '@/lib/api-endpoints'
 import { env } from '@/lib/env'
 
 export class ServiceError extends Error {
@@ -15,7 +16,7 @@ export class ServiceError extends Error {
 export class BackendUnavailableError extends ServiceError {
   constructor(service: string) {
     super(
-      `${service} is ready for the NestJS API. Set VITE_API_URL and replace the mock adapter to enable this action.`,
+      `${service} requires the backend API. Set VITE_API_URL in your .env file and start the Express server.`,
       503,
       'BACKEND_UNAVAILABLE',
     )
@@ -23,8 +24,31 @@ export class BackendUnavailableError extends ServiceError {
   }
 }
 
+const ACCESS_TOKEN_KEY = 'velora-access-token'
+
+export function getAccessToken(): string | null {
+  return localStorage.getItem(ACCESS_TOKEN_KEY)
+}
+
+export function setAccessToken(token: string | null) {
+  if (token) {
+    localStorage.setItem(ACCESS_TOKEN_KEY, token)
+  } else {
+    localStorage.removeItem(ACCESS_TOKEN_KEY)
+  }
+}
+
 export function getApiBaseUrl(): string {
-  return env.apiUrl.replace(/\/$/, '')
+  return apiEndpoints.baseUrl
+}
+
+export function isApiEnabled(): boolean {
+  return Boolean(env.apiUrl)
+}
+
+type ApiErrorBody = {
+  message?: string
+  code?: string
 }
 
 export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
@@ -33,16 +57,27 @@ export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T
     throw new BackendUnavailableError('API')
   }
 
+  const token = getAccessToken()
   const response = await fetch(`${baseUrl}${path}`, {
     ...init,
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...init?.headers,
     },
   })
 
+  if (response.status === 204) {
+    return undefined as T
+  }
+
   if (!response.ok) {
-    throw new ServiceError(`Request failed with status ${response.status}`, response.status)
+    const body = (await response.json().catch(() => ({}))) as ApiErrorBody
+    throw new ServiceError(
+      body.message ?? `Request failed with status ${response.status}`,
+      response.status,
+      body.code ?? 'REQUEST_FAILED',
+    )
   }
 
   return (await response.json()) as T

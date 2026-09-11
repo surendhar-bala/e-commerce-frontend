@@ -1,9 +1,11 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Search, X } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { recentSearchSeeds } from '@/data/content'
-import { products } from '@/data/products'
+import { useDebounce } from '@/hooks/use-debounce'
+import { productService } from '@/services'
+import type { Product } from '@/types/product'
 import { cn } from '@/lib/utils'
 
 type SearchExperienceProps = {
@@ -21,17 +23,31 @@ export function SearchExperience({
 }: SearchExperienceProps) {
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
+  const [suggestions, setSuggestions] = useState<Product[]>([])
   const navigate = useNavigate()
+  const debouncedQuery = useDebounce(query, 250)
 
-  const suggestions = useMemo(() => {
-    const value = query.trim().toLowerCase()
+  useEffect(() => {
+    const value = debouncedQuery.trim()
     if (!value) {
-      return []
+      setSuggestions([])
+      return
     }
-    return products
-      .filter((product) => product.name.toLowerCase().includes(value))
-      .slice(0, 5)
-  }, [query])
+    let active = true
+    productService
+      .list({ query: value, pageSize: 5 })
+      .then((result) => {
+        if (active) setSuggestions(result.items)
+      })
+      .catch(() => {
+        if (active) setSuggestions([])
+      })
+    return () => {
+      active = false
+    }
+  }, [debouncedQuery])
+
+  const hasSuggestions = useMemo(() => suggestions.length > 0, [suggestions])
 
   function submitSearch() {
     const value = query.trim()
@@ -83,7 +99,7 @@ export function SearchExperience({
 
       {open ? (
         <div className="absolute top-[calc(100%+0.5rem)] z-40 w-full overflow-hidden rounded-xl border bg-popover shadow-lift">
-          {suggestions.length > 0 ? (
+          {hasSuggestions ? (
             <ul className="p-2">
               {suggestions.map((product) => (
                 <li key={product.id}>

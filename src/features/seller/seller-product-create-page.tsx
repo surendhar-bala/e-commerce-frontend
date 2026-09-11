@@ -1,5 +1,6 @@
 import { useNavigate } from '@tanstack/react-router'
 import { ProductForm } from '@/features/admin/product-form'
+import { BackLink } from '@/components/common/back-link'
 import { useDocumentTitle } from '@/hooks/use-document-title'
 import { productService } from '@/services'
 import { useAuthStore } from '@/store/auth-store'
@@ -12,7 +13,8 @@ export function SellerProductCreatePage() {
 
   return (
     <div className="max-w-3xl">
-      <p className="text-caption">New listing</p>
+      <BackLink to="/seller/products" label="Back to products" />
+      <p className="text-caption mt-6">New listing</p>
       <h1 className="text-page mt-1">Add a product</h1>
       <p className="mt-2 text-small">List paints, toys, or daily essentials — photos, price in ₹, category, and stock.</p>
       <ProductForm

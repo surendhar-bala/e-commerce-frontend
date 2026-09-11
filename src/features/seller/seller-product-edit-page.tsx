@@ -1,5 +1,6 @@
 import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
+import { BackLink } from '@/components/common/back-link'
 import { ErrorState } from '@/components/common/error-state'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ProductForm } from '@/features/admin/product-form'
@@ -46,7 +47,8 @@ export function SellerProductEditPage({ productId }: SellerProductEditPageProps)
 
   return (
     <div className="max-w-3xl">
-      <p className="text-caption">Listing</p>
+      <BackLink to="/seller/products" label="Back to products" />
+      <p className="text-caption mt-6">Listing</p>
       <h1 className="text-page mt-1">Edit product</h1>
       <ProductForm
         key={product.id}

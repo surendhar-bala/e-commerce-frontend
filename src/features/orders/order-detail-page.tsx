@@ -1,7 +1,8 @@
-import { Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
+import { BackLink } from '@/components/common/back-link'
 import { ErrorState } from '@/components/common/error-state'
-import { Badge } from '@/components/ui/badge'
+import { OrderStatusBadge } from '@/components/common/order-status-badge'
+import { OrderStatusTracker } from '@/components/common/order-status-tracker'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useDocumentTitle } from '@/hooks/use-document-title'
 import { formatCurrency, formatDate } from '@/lib/format'
@@ -41,8 +42,10 @@ export function OrderDetailPage({ orderId }: OrderDetailPageProps) {
   if (status === 'loading') {
     return (
       <div className="container-page py-10">
-        <Skeleton className="h-10 w-48" />
-        <Skeleton className="mt-6 h-40 w-full" />
+        <BackLink to="/orders" label="Back to orders" />
+        <Skeleton className="mt-6 h-10 w-48" />
+        <Skeleton className="mt-6 h-24 w-full rounded-2xl" />
+        <Skeleton className="mt-6 h-40 w-full rounded-2xl" />
       </div>
     )
   }
@@ -57,24 +60,28 @@ export function OrderDetailPage({ orderId }: OrderDetailPageProps) {
 
   return (
     <div className="container-page py-8 md:py-12">
-      <Link to="/orders" className="text-sm hover:text-primary">
-        ← All orders
-      </Link>
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        <h1 className="text-page">{order.id.toUpperCase()}</h1>
-        <Badge variant="secondary">{order.status}</Badge>
+      <BackLink to="/orders" label="Back to orders" />
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <h1 className="text-page">Order #{order.id.slice(0, 8).toUpperCase()}</h1>
+        <OrderStatusBadge status={order.status} />
       </div>
       <p className="mt-2 text-small">Placed {formatDate(order.placedAt)}</p>
+
+      <div className="surface-card mt-8 p-5 sm:p-6">
+        <h2 className="font-display text-xl">Delivery status</h2>
+        <OrderStatusTracker status={order.status} className="mt-5" />
+      </div>
+
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
-        <div className="rounded-2xl bg-card p-6 shadow-soft lg:col-span-2">
+        <div className="surface-card p-6 lg:col-span-2">
           <h2 className="font-display text-xl">Items</h2>
           <ul className="mt-4 space-y-4">
             {order.items.map((item) => (
-              <li key={item.productId} className="flex gap-4">
+              <li key={item.productId} className="flex gap-4 rounded-xl border border-border/60 p-3">
                 <img
                   src={`${item.imageUrl}?auto=format&fit=crop&w=160&q=80`}
                   alt=""
-                  className="size-16 rounded-md object-cover"
+                  className="size-16 rounded-lg object-cover"
                 />
                 <div className="flex-1">
                   <p className="font-medium">{item.name}</p>
@@ -86,7 +93,20 @@ export function OrderDetailPage({ orderId }: OrderDetailPageProps) {
           </ul>
         </div>
         <div className="space-y-6">
-          <div className="rounded-2xl bg-card p-6 shadow-soft">
+          <div className="surface-card p-6">
+            <h2 className="font-display text-xl">Contact</h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              {order.customerEmail ? (
+                <>
+                  {order.customerEmail}
+                  <br />
+                </>
+              ) : null}
+              {order.customerPhone ? order.customerPhone : null}
+              {!order.customerEmail && !order.customerPhone ? '—' : null}
+            </p>
+          </div>
+          <div className="surface-card p-6">
             <h2 className="font-display text-xl">Shipping</h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               {order.shippingAddress.fullName}
@@ -98,7 +118,7 @@ export function OrderDetailPage({ orderId }: OrderDetailPageProps) {
               {order.shippingAddress.country}
             </p>
           </div>
-          <div className="rounded-2xl bg-card p-6 shadow-soft">
+          <div className="surface-card p-6">
             <h2 className="font-display text-xl">Total</h2>
             <p className="mt-3 text-price text-2xl">{formatCurrency(order.total)}</p>
           </div>

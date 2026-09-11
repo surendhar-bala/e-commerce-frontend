@@ -9,21 +9,24 @@ import { useDocumentTitle } from '@/hooks/use-document-title'
 import { formatCurrency } from '@/lib/format'
 import { getMediaUrl } from '@/lib/media'
 import { productService } from '@/services'
-import { categories } from '@/data/categories'
-import type { Product } from '@/types/product'
+import type { Product, ProductCategory } from '@/types/product'
 
 export function AdminProductsPage() {
   useDocumentTitle('Admin products')
   const [items, setItems] = useState<Product[]>([])
+  const [categories, setCategories] = useState<ProductCategory[]>([])
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
 
   useEffect(() => {
     let active = true
-    productService
-      .list({ pageSize: 50, sort: 'newest' })
-      .then((result) => {
+    Promise.all([
+      productService.list({ pageSize: 50, sort: 'newest' }),
+      productService.listCategories(),
+    ])
+      .then(([result, nextCategories]) => {
         if (!active) return
         setItems(result.items)
+        setCategories(nextCategories)
         setStatus('ready')
       })
       .catch(() => {

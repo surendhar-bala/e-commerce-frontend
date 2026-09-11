@@ -34,27 +34,50 @@ function slugify(value: string) {
 }
 
 function mediaFromDraft(draft: ProductDraft, fallbackName: string, existing?: ProductMedia[]): ProductMedia[] {
+  if (draft.mediaItems?.length) {
+    return draft.mediaItems.map((item, index) => ({
+      id: existing?.[index]?.id ?? crypto.randomUUID(),
+      url: item.url,
+      alt: fallbackName,
+      type: item.type,
+      publicId: item.r2Key,
+    }))
+  }
+
   const urls = (draft.imageUrls ?? []).filter(Boolean)
   if (draft.imageUrl) {
     urls.unshift(draft.imageUrl)
   }
-  const unique = [...new Set(urls)]
-  if (unique.length === 0) {
-    return existing?.length
-      ? existing
-      : [
-          {
-            id: crypto.randomUUID(),
-            url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8',
-            alt: fallbackName,
-          },
-        ]
+  const unique = [...new Set(urls)].slice(0, 5)
+  const images: ProductMedia[] =
+    unique.length === 0
+      ? existing?.filter((item) => item.type !== 'video')?.length
+        ? existing.filter((item) => item.type !== 'video')
+        : [
+            {
+              id: crypto.randomUUID(),
+              url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8',
+              alt: fallbackName,
+              type: 'image',
+            },
+          ]
+      : unique.map((url, index) => ({
+          id: existing?.[index]?.id ?? crypto.randomUUID(),
+          url,
+          alt: fallbackName,
+          type: 'image' as const,
+        }))
+
+  if (draft.videoUrl) {
+    images.push({
+      id: crypto.randomUUID(),
+      url: draft.videoUrl,
+      alt: `${fallbackName} video`,
+      type: 'video',
+    })
   }
-  return unique.map((url, index) => ({
-    id: existing?.[index]?.id ?? crypto.randomUUID(),
-    url,
-    alt: fallbackName,
-  }))
+
+  return images
 }
 
 function applyFilters(items: Product[], filters: Parameters<ProductService['list']>[0] = {}): Product[] {
@@ -99,6 +122,19 @@ function applyFilters(items: Product[], filters: Parameters<ProductService['list
       break
     case 'newest':
       next = [...next].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
+      break
+    case 'discount':
+      next = [...next].sort((a, b) => {
+        const discountA =
+          a.compareAtPrice && a.compareAtPrice > a.price
+            ? (a.compareAtPrice - a.price) / a.compareAtPrice
+            : 0
+        const discountB =
+          b.compareAtPrice && b.compareAtPrice > b.price
+            ? (b.compareAtPrice - b.price) / b.compareAtPrice
+            : 0
+        return discountB - discountA
+      })
       break
     default:
       next = [...next].sort((a, b) => Number(b.featured) - Number(a.featured))

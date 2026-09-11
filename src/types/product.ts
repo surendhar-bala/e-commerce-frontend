@@ -10,6 +10,7 @@ export type ProductMedia = {
   id: string
   url: string
   alt: string
+  type?: 'image' | 'video'
   publicId?: string
   width?: number
   height?: number
@@ -48,7 +49,7 @@ export type ProductFilters = {
   category?: string
   minPrice?: number
   maxPrice?: number
-  sort?: 'featured' | 'newest' | 'price-asc' | 'price-desc'
+  sort?: 'featured' | 'newest' | 'price-asc' | 'price-desc' | 'discount'
   page?: number
   pageSize?: number
   sellerId?: string

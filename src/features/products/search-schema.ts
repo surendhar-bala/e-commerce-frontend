@@ -5,7 +5,7 @@ export const productSearchSchema = z.object({
   category: z.string().optional(),
   minPrice: z.number().optional(),
   maxPrice: z.number().optional(),
-  sort: z.enum(['featured', 'newest', 'price-asc', 'price-desc']).optional(),
+  sort: z.enum(['featured', 'newest', 'price-asc', 'price-desc', 'discount']).optional(),
   page: z.number().optional(),
 })
 

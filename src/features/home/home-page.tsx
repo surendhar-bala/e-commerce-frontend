@@ -1,17 +1,37 @@
 import { Link } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { PriceDisplay } from '@/components/common/price-display'
 import { SectionHeading } from '@/components/common/section-heading'
 import { ProductCard } from '@/components/product/product-card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { categories } from '@/data/categories'
 import { reasons, trustStats } from '@/data/content'
-import { products } from '@/data/products'
 import { getMediaUrl } from '@/lib/media'
+import { categories } from '@/data/categories'
+import { productService } from '@/services'
+import type { Product } from '@/types/product'
 import { toast } from 'sonner'
 
 export function HomePage() {
+  const [products, setProducts] = useState<Product[]>([])
+
+  useEffect(() => {
+    let active = true
+    productService
+      .list({ pageSize: 100, sort: 'featured' })
+      .then((result) => {
+        if (!active) return
+        setProducts(result.items)
+      })
+      .catch(() => {
+        if (active) setProducts([])
+      })
+    return () => {
+      active = false
+    }
+  }, [])
+
   const featured = products.filter((product) => product.featured).slice(0, 4)
   const trending = products.filter((product) => product.trending).slice(0, 8)
 
@@ -88,7 +108,6 @@ export function HomePage() {
             <ProductCard
               key={product.id}
               product={product}
-              category={categories.find((category) => category.id === product.categoryId)}
             />
           ))}
         </div>

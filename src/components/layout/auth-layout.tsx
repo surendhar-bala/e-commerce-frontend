@@ -20,12 +20,12 @@ export function AuthLayout({ children }: { children: ReactNode }) {
         </div>
       </div>
       <div className="flex min-h-svh flex-col">
-        <div className="flex items-center justify-between px-6 py-5">
+        <div className="flex shrink-0 items-center justify-between px-6 py-5">
           <Logo />
           <ThemeToggle />
         </div>
-        <div className="flex flex-1 items-center justify-center px-6 py-10">
-          <div className="w-full max-w-md">{children}</div>
+        <div className="flex flex-1 items-start justify-center overflow-y-auto px-6 py-6 sm:items-center sm:py-10">
+          <div className="w-full max-w-md py-4">{children}</div>
         </div>
       </div>
     </div>

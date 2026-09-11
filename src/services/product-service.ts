@@ -9,6 +9,8 @@ export type ProductDraft = {
   stock: number
   imageUrl?: string
   imageUrls?: string[]
+  videoUrl?: string
+  mediaItems?: Array<{ url: string; r2Key?: string; type: 'image' | 'video' }>
   sellerId?: string
   status?: ProductStatus
 }

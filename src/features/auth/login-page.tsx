@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { PasswordInput } from '@/components/ui/password-input'
 import { useDocumentTitle } from '@/hooks/use-document-title'
 import { authService } from '@/services'
 import { ServiceError } from '@/services/http'
@@ -50,10 +51,15 @@ export function LoginPage() {
             setServerError(null)
             try {
               const session = await authService.login(values)
-              setSession(session.user)
+              setSession(session.user, session.accessToken)
               toast.success(`Signed in as ${session.user.name}.`)
               await navigate({
-                to: session.user.role === UserRole.Seller ? '/seller' : session.user.role === UserRole.Admin ? '/admin' : '/',
+                to:
+                  session.user.role === UserRole.Seller
+                    ? '/seller'
+                    : session.user.role === UserRole.Admin
+                      ? '/admin'
+                      : '/products',
               })
             } catch (error) {
               setServerError(
@@ -82,7 +88,7 @@ export function LoginPage() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input type="password" autoComplete="current-password" {...field} />
+                  <PasswordInput autoComplete="current-password" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

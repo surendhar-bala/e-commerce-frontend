@@ -26,6 +26,7 @@ import { Route as ProductsProductIdRouteImport } from './routes/products/$produc
 import { Route as SellerIndexRouteImport } from './routes/seller/index'
 import { Route as AdminProductsIndexRouteImport } from './routes/admin/products/index'
 import { Route as AdminProductsCreateRouteImport } from './routes/admin/products/create'
+import { Route as SellerOrdersIndexRouteImport } from './routes/seller/orders/index'
 import { Route as SellerProductsIndexRouteImport } from './routes/seller/products/index'
 import { Route as SellerProductsCreateRouteImport } from './routes/seller/products/create'
 import { Route as AdminProductsProductIdEditRouteImport } from './routes/admin/products/$productId/edit'
@@ -116,6 +117,11 @@ const AdminProductsCreateRoute = AdminProductsCreateRouteImport.update({
   path: '/products/create',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const SellerOrdersIndexRoute = SellerOrdersIndexRouteImport.update({
+  id: '/orders/',
+  path: '/orders/',
+  getParentRoute: () => SellerRouteRoute,
+} as any)
 const SellerProductsIndexRoute = SellerProductsIndexRouteImport.update({
   id: '/products/',
   path: '/products/',
@@ -158,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/admin/products/create': typeof AdminProductsCreateRoute
   '/seller/products/create': typeof SellerProductsCreateRoute
   '/admin/products/': typeof AdminProductsIndexRoute
+  '/seller/orders/': typeof SellerOrdersIndexRoute
   '/seller/products/': typeof SellerProductsIndexRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
   '/seller/products/$productId/edit': typeof SellerProductsProductIdEditRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByTo {
   '/admin/products/create': typeof AdminProductsCreateRoute
   '/seller/products/create': typeof SellerProductsCreateRoute
   '/admin/products': typeof AdminProductsIndexRoute
+  '/seller/orders': typeof SellerOrdersIndexRoute
   '/seller/products': typeof SellerProductsIndexRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
   '/seller/products/$productId/edit': typeof SellerProductsProductIdEditRoute
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/admin/products/create': typeof AdminProductsCreateRoute
   '/seller/products/create': typeof SellerProductsCreateRoute
   '/admin/products/': typeof AdminProductsIndexRoute
+  '/seller/orders/': typeof SellerOrdersIndexRoute
   '/seller/products/': typeof SellerProductsIndexRoute
   '/admin/products/$productId/edit': typeof AdminProductsProductIdEditRoute
   '/seller/products/$productId/edit': typeof SellerProductsProductIdEditRoute
@@ -228,6 +237,7 @@ export interface FileRouteTypes {
     | '/admin/products/create'
     | '/seller/products/create'
     | '/admin/products/'
+    | '/seller/orders/'
     | '/seller/products/'
     | '/admin/products/$productId/edit'
     | '/seller/products/$productId/edit'
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/admin/products/create'
     | '/seller/products/create'
     | '/admin/products'
+    | '/seller/orders'
     | '/seller/products'
     | '/admin/products/$productId/edit'
     | '/seller/products/$productId/edit'
@@ -272,6 +283,7 @@ export interface FileRouteTypes {
     | '/admin/products/create'
     | '/seller/products/create'
     | '/admin/products/'
+    | '/seller/orders/'
     | '/seller/products/'
     | '/admin/products/$productId/edit'
     | '/seller/products/$productId/edit'
@@ -414,6 +426,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProductsCreateRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/seller/orders/': {
+      id: '/seller/orders/'
+      path: '/orders'
+      fullPath: '/seller/orders/'
+      preLoaderRoute: typeof SellerOrdersIndexRouteImport
+      parentRoute: typeof SellerRouteRoute
+    }
     '/seller/products/': {
       id: '/seller/products/'
       path: '/products'
@@ -466,6 +485,7 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 interface SellerRouteRouteChildren {
   SellerIndexRoute: typeof SellerIndexRoute
   SellerProductsCreateRoute: typeof SellerProductsCreateRoute
+  SellerOrdersIndexRoute: typeof SellerOrdersIndexRoute
   SellerProductsIndexRoute: typeof SellerProductsIndexRoute
   SellerProductsProductIdEditRoute: typeof SellerProductsProductIdEditRoute
 }
@@ -473,6 +493,7 @@ interface SellerRouteRouteChildren {
 const SellerRouteRouteChildren: SellerRouteRouteChildren = {
   SellerIndexRoute: SellerIndexRoute,
   SellerProductsCreateRoute: SellerProductsCreateRoute,
+  SellerOrdersIndexRoute: SellerOrdersIndexRoute,
   SellerProductsIndexRoute: SellerProductsIndexRoute,
   SellerProductsProductIdEditRoute: SellerProductsProductIdEditRoute,
 }

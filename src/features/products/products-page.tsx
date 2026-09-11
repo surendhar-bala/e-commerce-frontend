@@ -1,134 +1,117 @@
-import { Link, useNavigate } from '@tanstack/react-router'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { EmptyState } from '@/components/common/empty-state'
 import { ErrorState } from '@/components/common/error-state'
 import { LoadingState } from '@/components/common/loading-state'
 import { ProductFilters } from '@/components/product/product-filters'
 import { ProductGrid } from '@/components/product/product-grid'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
 import { Button } from '@/components/ui/button'
+import { getCategoryName } from '@/data/categories'
 import { useDocumentTitle } from '@/hooks/use-document-title'
 import { PAGE_SIZE } from '@/lib/constants'
 import { productService } from '@/services'
-import type { ProductSearch } from '@/features/products/search-schema'
-import type { PaginatedProducts, ProductCategory } from '@/types/product'
+import type { PaginatedProducts } from '@/types/product'
 
-type ProductsPageProps = {
-  search: ProductSearch
-}
-
-export function ProductsPage({ search }: ProductsPageProps) {
+export function ProductsPage() {
   useDocumentTitle('Products')
-  const navigate = useNavigate()
+  const navigate = useNavigate({ from: '/products/' })
+  const search = useSearch({ from: '/products/' })
   const [data, setData] = useState<PaginatedProducts | null>(null)
-  const [categories, setCategories] = useState<ProductCategory[]>([])
-  const [loadedKey, setLoadedKey] = useState<string | null>(null)
-  const [failedKey, setFailedKey] = useState<string | null>(null)
-  const requestKey = JSON.stringify(search)
-  const status =
-    failedKey === requestKey ? 'error' : loadedKey === requestKey ? 'ready' : 'loading'
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+  const [debouncedQuery, setDebouncedQuery] = useState(search.q ?? '')
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedQuery(search.q ?? ''), 300)
+    return () => window.clearTimeout(timer)
+  }, [search.q])
 
   useEffect(() => {
     let active = true
-    Promise.all([
-      productService.list({
-        query: search.q,
-        category: search.category,
-        minPrice: search.minPrice,
-        maxPrice: search.maxPrice,
-        sort: search.sort,
+    setStatus('loading')
+
+    productService
+      .list({
         page: search.page ?? 1,
         pageSize: PAGE_SIZE,
-      }),
-      productService.listCategories(),
-    ])
-      .then(([result, nextCategories]) => {
+        sort: search.sort ?? 'featured',
+        category: search.category,
+        query: debouncedQuery || undefined,
+      })
+      .then((result) => {
         if (!active) return
         setData(result)
-        setCategories(nextCategories)
-        setLoadedKey(requestKey)
-        setFailedKey(null)
+        setStatus('ready')
       })
       .catch(() => {
-        if (active) setFailedKey(requestKey)
+        if (active) setStatus('error')
       })
+
     return () => {
       active = false
     }
-  }, [search, requestKey])
+  }, [search.page, search.sort, search.category, debouncedQuery])
 
-  const page = search.page ?? 1
-  const totalPages = data ? Math.max(1, Math.ceil(data.total / data.pageSize)) : 1
+  function updateSearch(next: typeof search) {
+    void navigate({ search: next })
+  }
+
+  function reload() {
+    updateSearch({ ...search })
+  }
+
+  const categoryLabel = search.category ? getCategoryName(search.category) : null
 
   return (
     <div className="container-page py-8 md:py-12">
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link to="/">Home</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Products</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-      <h1 className="text-page mt-5">All products</h1>
-      <p className="mt-2 max-w-xl text-small">
-        Painting materials, kids’ toys, and everyday products — priced in ₹. Clothing is not listed yet.
-      </p>
-      <div className="mt-8">
-        <ProductFilters
-          categories={categories}
-          search={search}
-          onChange={(next) => {
-            void navigate({ to: '/products', search: next })
-          }}
-        />
+      <div className="max-w-2xl">
+        <p className="text-caption">Shop</p>
+        <h1 className="text-page mt-2">
+          {categoryLabel ? categoryLabel : 'All products'}
+        </h1>
+        <p className="mt-2 text-small">
+          {categoryLabel
+            ? `Browse ${categoryLabel.toLowerCase()} — filter, search, and sort to find what you need.`
+            : 'Browse our collection — filter by category, search, or sort by price and discount.'}
+        </p>
       </div>
-      <div className="mt-10">
+
+      <div className="mt-8">
+        <ProductFilters search={search} onChange={updateSearch} />
+      </div>
+
+      <div className="mt-8">
         {status === 'loading' ? <LoadingState /> : null}
-        {status === 'error' ? (
-          <ErrorState onRetry={() => void navigate({ to: '/products', search })} />
-        ) : null}
+        {status === 'error' ? <ErrorState onRetry={reload} /> : null}
         {status === 'ready' && data?.items.length === 0 ? (
           <EmptyState
-            title="Nothing matches"
-            description="Try another category, a wider price range, or a simpler search."
+            title={search.q || search.category ? 'No products found' : 'No products yet'}
+            description={
+              search.q || search.category
+                ? 'Try a different search term or category, or clear your filters.'
+                : 'Check back soon — new products are added regularly.'
+            }
+            action={
+              search.q || search.category ? (
+                <Button type="button" variant="outline" onClick={() => updateSearch({ page: 1 })}>
+                  Clear filters
+                </Button>
+              ) : undefined
+            }
           />
         ) : null}
         {status === 'ready' && data && data.items.length > 0 ? (
           <>
-            <p className="mb-6 text-sm text-muted-foreground">{data.total} pieces</p>
-            <ProductGrid products={data.items} categories={categories} />
-            <div className="mt-10 flex items-center justify-center gap-3">
-              <Button
-                variant="outline"
-                disabled={page <= 1}
-                onClick={() => void navigate({ to: '/products', search: { ...search, page: page - 1 } })}
-              >
-                Previous
-              </Button>
-              <span className="text-sm text-muted-foreground">
-                Page {page} of {totalPages}
-              </span>
-              <Button
-                variant="outline"
-                disabled={page >= totalPages}
-                onClick={() => void navigate({ to: '/products', search: { ...search, page: page + 1 } })}
-              >
-                Next
-              </Button>
-            </div>
+            <p className="mb-6 text-sm text-muted-foreground">
+              Showing {data.items.length} of {data.total} {data.total === 1 ? 'product' : 'products'}
+            </p>
+            <ProductGrid products={data.items} />
+            {data.total > data.pageSize ? (
+              <div className="mt-10 flex justify-center">
+                <Button variant="outline" disabled>
+                  Showing {data.items.length} of {data.total}
+                </Button>
+              </div>
+            ) : null}
           </>
         ) : null}
       </div>

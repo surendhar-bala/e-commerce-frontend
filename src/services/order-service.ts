@@ -4,6 +4,8 @@ import type { CartItem } from '@/types/cart'
 export type CreateOrderPayload = {
   items: CartItem[]
   shippingAddress: ShippingAddress
+  customerEmail: string
+  customerPhone: string
 }
 
 export type OrderService = {
