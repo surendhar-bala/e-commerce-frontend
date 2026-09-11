@@ -1,5 +1,5 @@
 import { Link, useNavigate } from '@tanstack/react-router'
-import { LayoutDashboard, LogOut, Package, Plus, ShoppingBag } from 'lucide-react'
+import { LayoutDashboard, LogOut, Package, ShoppingBag } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Logo } from '@/components/common/logo'
 import { ThemeToggle } from '@/components/common/theme-toggle'
@@ -13,7 +13,6 @@ const links = [
   { to: '/seller', label: 'Overview', icon: LayoutDashboard },
   { to: '/seller/products', label: 'My products', icon: Package },
   { to: '/seller/orders', label: 'Orders', icon: ShoppingBag },
-  { to: '/seller/products/create', label: 'Add product', icon: Plus },
 ] as const
 
 export function SellerLayout({ children }: { children: ReactNode }) {

@@ -50,16 +50,6 @@ const schema = z
 
     password: z.string().min(8, 'Use at least 8 characters.'),
 
-    confirmPassword: z.string().min(8, 'Confirm your password.'),
-
-  })
-
-  .refine((values) => values.password === values.confirmPassword, {
-
-    message: 'Passwords do not match.',
-
-    path: ['confirmPassword'],
-
   })
 
 
@@ -91,8 +81,6 @@ export function RegisterPage() {
       email: '',
 
       password: '',
-
-      confirmPassword: '',
 
     },
 
@@ -259,32 +247,6 @@ export function RegisterPage() {
                 <FormControl>
 
                   <PasswordInput autoComplete="new-password" placeholder="At least 8 characters" {...field} />
-
-                </FormControl>
-
-                <FormMessage />
-
-              </FormItem>
-
-            )}
-
-          />
-
-          <FormField
-
-            control={form.control}
-
-            name="confirmPassword"
-
-            render={({ field }) => (
-
-              <FormItem>
-
-                <FormLabel>Confirm password</FormLabel>
-
-                <FormControl>
-
-                  <PasswordInput autoComplete="new-password" {...field} />
 
                 </FormControl>
 

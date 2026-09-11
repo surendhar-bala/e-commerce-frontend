@@ -4,12 +4,12 @@ import { ResetPasswordPage } from '@/features/auth/reset-password-page'
 
 export const Route = createFileRoute('/reset-password')({
   validateSearch: z.object({
-    token: z.string().optional(),
+    email: z.string().email().optional(),
   }),
   component: ResetPasswordRoute,
 })
 
 function ResetPasswordRoute() {
-  const { token } = Route.useSearch()
-  return <ResetPasswordPage token={token} />
+  const { email } = Route.useSearch()
+  return <ResetPasswordPage email={email} />
 }

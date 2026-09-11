@@ -5,7 +5,7 @@ import type { OrderStatus } from '@/types/order'
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
   pending: 'bg-warning/15 text-warning-foreground border-warning/30',
-  paid: 'bg-info/15 text-info-foreground border-info/30',
+  paid: 'border-sky-300 bg-sky-100 text-sky-900 dark:border-sky-700 dark:bg-sky-950 dark:text-sky-100',
   shipped: 'bg-primary/15 text-primary border-primary/30',
   delivered: 'bg-success/15 text-success-foreground border-success/30',
   cancelled: 'bg-destructive/10 text-destructive border-destructive/20',

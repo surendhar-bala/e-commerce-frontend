@@ -1,8 +1,8 @@
 import { Link } from '@tanstack/react-router'
 import { ShoppingBag } from 'lucide-react'
 import { PriceDisplay } from '@/components/common/price-display'
+import { ProductMediaCarousel } from '@/components/product/product-media-carousel'
 import { Button } from '@/components/ui/button'
-import { getMediaUrl } from '@/lib/media'
 import { cn } from '@/lib/utils'
 import { useCartStore } from '@/store/cart-store'
 import type { Product } from '@/types/product'
@@ -14,36 +14,35 @@ type ProductCardProps = {
 
 export function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem)
-  const image = product.media.find((item) => item.type !== 'video') ?? product.media[0]
   const inStock = Math.max(0, Number(product.stock) || 0) > 0
 
   return (
     <article className="group flex flex-col">
       <div className="relative overflow-hidden rounded-2xl border bg-secondary/50">
-        <Link to="/products/$productId" params={{ productId: product.id }} className="block">
-          {image ? (
-            <img
-              src={getMediaUrl(image, 720)}
-              alt={image.alt}
-              loading="lazy"
-              className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-            />
-          ) : (
-            <div className="aspect-square bg-muted" />
-          )}
+        <Link to="/products/$productId" params={{ productId: product.id }} className="relative block">
+          <ProductMediaCarousel
+            media={product.media}
+            alt={product.name}
+            imageWidth={720}
+            className="transition-transform duration-500 group-hover:scale-[1.03]"
+          />
         </Link>
         <div
           className={cn(
-            'absolute inset-x-3 bottom-3 transition-all duration-200',
+            'pointer-events-none absolute inset-x-0 bottom-0 z-20 px-3 pb-3 pt-10',
+            'bg-gradient-to-t from-black/55 via-black/25 to-transparent',
+            'transition-all duration-200',
             'opacity-100 translate-y-0 md:opacity-0 md:translate-y-2 md:group-hover:opacity-100 md:group-hover:translate-y-0',
           )}
         >
           <Button
             type="button"
             size="sm"
-            className="w-full shadow-soft"
+            className="pointer-events-auto w-full shadow-soft"
             disabled={!inStock}
-            onClick={() => {
+            onClick={(event) => {
+              event.preventDefault()
+              event.stopPropagation()
               const added = addItem(product)
               if (added) {
                 toast.success(`${product.name} added to cart`)

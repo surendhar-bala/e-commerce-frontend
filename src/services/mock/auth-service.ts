@@ -89,12 +89,25 @@ export const mockAuthService: AuthService = {
     return
   },
 
-  async forgotPassword() {
-    return
+  async forgotPassword(payload) {
+    const accounts = loadAccounts()
+    const email = payload.email.trim().toLowerCase()
+    const exists = accounts.some((account) => account.email.toLowerCase() === email)
+    if (!exists) {
+      throw new ServiceError('No account found with this email address.', 404, 'EMAIL_NOT_FOUND')
+    }
   },
 
-  async resetPassword() {
-    return
+  async resetPassword(payload) {
+    const accounts = loadAccounts()
+    const email = payload.email.trim().toLowerCase()
+    const index = accounts.findIndex((account) => account.email.toLowerCase() === email)
+    if (index === -1) {
+      throw new ServiceError('No account found with this email address.', 404, 'EMAIL_NOT_FOUND')
+    }
+
+    accounts[index] = { ...accounts[index], password: payload.password }
+    saveAccounts(accounts)
   },
 
   async getSession() {

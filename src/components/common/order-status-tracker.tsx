@@ -28,15 +28,21 @@ export function OrderStatusTracker({ status, className }: OrderStatusTrackerProp
           <li
             key={step}
             className={cn(
-              'flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm',
-              complete ? 'border-primary/30 bg-primary/5 text-foreground' : 'border-border bg-muted/30 text-muted-foreground',
-              active && 'ring-1 ring-primary/30',
+              'flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm transition-colors',
+              complete
+                ? 'border-primary/30 bg-primary/5 text-foreground dark:border-primary/40 dark:bg-primary/10'
+                : 'border-border bg-muted/30 text-muted-foreground',
+              active &&
+                'border-primary bg-primary/15 ring-2 ring-primary/25 dark:border-primary/50 dark:bg-primary/20 dark:ring-primary/35',
             )}
           >
             <span
               className={cn(
                 'flex size-6 shrink-0 items-center justify-center rounded-full border text-xs',
-                complete ? 'border-primary bg-primary text-primary-foreground' : 'border-border',
+                complete
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border bg-background text-muted-foreground',
+                active && 'ring-2 ring-primary/30 ring-offset-2 ring-offset-background',
               )}
             >
               {complete && index < currentIndex ? <Check className="size-3.5" /> : index + 1}

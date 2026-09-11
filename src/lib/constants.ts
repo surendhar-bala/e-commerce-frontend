@@ -9,7 +9,7 @@ export const STANDARD_SHIPPING = 49
 export const TAX_RATE = 0.18
 export const PRICE_FILTER_MAX = 2500
 
-export const PAGE_SIZE = 12
+export const PAGE_SIZE = 10
 
 export const SORT_OPTIONS = [
   { value: 'featured', label: 'Featured' },

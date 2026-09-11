@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { EmptyState } from '@/components/common/empty-state'
 import { ErrorState } from '@/components/common/error-state'
 import { LoadingState } from '@/components/common/loading-state'
+import { Pagination } from '@/components/common/pagination'
 import { ProductFilters } from '@/components/product/product-filters'
 import { ProductGrid } from '@/components/product/product-grid'
 import { Button } from '@/components/ui/button'
@@ -60,12 +61,17 @@ export function ProductsPage() {
   }
 
   const categoryLabel = search.category ? getCategoryName(search.category) : null
+  const currentPage = search.page ?? 1
+
+  function goToPage(page: number) {
+    updateSearch({ ...search, page })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   return (
     <div className="container-page py-8 md:py-12">
       <div className="max-w-2xl">
-        <p className="text-caption">Shop</p>
-        <h1 className="text-page mt-2">
+        <h1 className="text-page">
           {categoryLabel ? categoryLabel : 'All products'}
         </h1>
         <p className="mt-2 text-small">
@@ -102,15 +108,19 @@ export function ProductsPage() {
         {status === 'ready' && data && data.items.length > 0 ? (
           <>
             <p className="mb-6 text-sm text-muted-foreground">
-              Showing {data.items.length} of {data.total} {data.total === 1 ? 'product' : 'products'}
+              Showing {(currentPage - 1) * data.pageSize + 1}–
+              {(currentPage - 1) * data.pageSize + data.items.length} of {data.total}{' '}
+              {data.total === 1 ? 'product' : 'products'}
             </p>
             <ProductGrid products={data.items} />
-            {data.total > data.pageSize ? (
-              <div className="mt-10 flex justify-center">
-                <Button variant="outline" disabled>
-                  Showing {data.items.length} of {data.total}
-                </Button>
-              </div>
+            {data.total > PAGE_SIZE ? (
+              <Pagination
+                className="mt-10"
+                page={currentPage}
+                pageSize={data.pageSize}
+                total={data.total}
+                onPageChange={goToPage}
+              />
             ) : null}
           </>
         ) : null}

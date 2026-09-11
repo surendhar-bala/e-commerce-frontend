@@ -1,10 +1,9 @@
-import { ArrowUpDown, Search, X } from 'lucide-react'
+import { ArrowUpDown, Search, Tag, X } from 'lucide-react'
 import { categories } from '@/data/categories'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { SORT_OPTIONS } from '@/lib/constants'
-import { cn } from '@/lib/utils'
 import type { ProductSearch } from '@/features/products/search-schema'
 
 type ProductFiltersProps = {
@@ -30,6 +29,29 @@ export function ProductFilters({ search, onChange }: ProductFiltersProps) {
           />
         </div>
         <Select
+          value={activeCategory}
+          onValueChange={(value) =>
+            onChange({
+              ...search,
+              category: value === 'all' ? undefined : value,
+              page: 1,
+            })
+          }
+        >
+          <SelectTrigger className="h-11 w-full rounded-full border-border/70 bg-secondary/40 shadow-none sm:w-[11.5rem]">
+            <Tag className="size-4 shrink-0 text-muted-foreground" />
+            <SelectValue placeholder="Category" />
+          </SelectTrigger>
+          <SelectContent align="end">
+            <SelectItem value="all">All categories</SelectItem>
+            {categories.map((category) => (
+              <SelectItem key={category.id} value={category.id}>
+                {category.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
           value={search.sort ?? 'featured'}
           onValueChange={(value) =>
             onChange({ ...search, sort: value as ProductSearch['sort'], page: 1 })
@@ -49,47 +71,20 @@ export function ProductFilters({ search, onChange }: ProductFiltersProps) {
         </Select>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          onClick={() => onChange({ ...search, category: undefined, page: 1 })}
-          className={cn(
-            'rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors',
-            activeCategory === 'all'
-              ? 'border-primary bg-primary text-primary-foreground'
-              : 'border-border/70 bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground',
-          )}
-        >
-          All
-        </button>
-        {categories.map((category) => (
-          <button
-            key={category.id}
-            type="button"
-            onClick={() => onChange({ ...search, category: category.id, page: 1 })}
-            className={cn(
-              'rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors',
-              activeCategory === category.id
-                ? 'border-primary bg-primary text-primary-foreground'
-                : 'border-border/70 bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground',
-            )}
-          >
-            {category.name}
-          </button>
-        ))}
-        {hasActiveFilters ? (
+      {hasActiveFilters ? (
+        <div className="flex justify-end">
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            className="ml-auto gap-1.5 rounded-full text-muted-foreground"
+            className="gap-1.5 rounded-full text-muted-foreground"
             onClick={() => onChange({ page: 1 })}
           >
             <X className="size-3.5" />
             Clear
           </Button>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
     </div>
   )
 }

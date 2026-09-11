@@ -1,55 +1,36 @@
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  PRODUCT_MEDIA_CAROUSEL_INTERVAL_MS,
+  ProductMediaCarousel,
+} from '@/components/product/product-media-carousel'
 import { getMediaUrl } from '@/lib/media'
+import { getProductMediaSlides, isProductVideo } from '@/lib/product-media'
 import { cn } from '@/lib/utils'
 import type { ProductMedia } from '@/types/product'
-
-const MAX_IMAGES = 5
 
 type ProductGalleryProps = {
   media: ProductMedia[]
   name: string
 }
 
-type GalleryImage = {
-  kind: 'image'
-  item: ProductMedia
-}
-
-type GalleryVideo = {
-  kind: 'video'
-  item: ProductMedia
-}
-
-type GallerySlide = GalleryImage | GalleryVideo
-
-function isVideo(item: ProductMedia) {
-  return item.type === 'video' || /\.(mp4|webm|ogg|mov)(\?|$)/i.test(item.url)
-}
-
-function buildSlides(media: ProductMedia[]): GallerySlide[] {
-  const images = media.filter((item) => !isVideo(item)).slice(0, MAX_IMAGES)
-  const video = media.find((item) => isVideo(item))
-
-  const slides: GallerySlide[] = images.map((item) => ({ kind: 'image', item }))
-  if (video) {
-    slides.push({ kind: 'video', item: video })
-  }
-  return slides
-}
-
 export function ProductGallery({ media, name }: ProductGalleryProps) {
-  const slides = useMemo(() => buildSlides(media), [media])
+  const slides = useMemo(() => getProductMediaSlides(media), [media])
   const [activeIndex, setActiveIndex] = useState(0)
 
   useEffect(() => {
     setActiveIndex(0)
   }, [media])
 
-  const activeSlide = slides[activeIndex]
-  const imageCount = slides.filter((slide) => slide.kind === 'image').length
-  const hasVideo = slides.some((slide) => slide.kind === 'video')
-  const coverImage = slides.find((slide): slide is GalleryImage => slide.kind === 'image')?.item
+  useEffect(() => {
+    if (slides.length <= 1) return
+
+    const timer = window.setInterval(() => {
+      setActiveIndex((current) => (current + 1) % slides.length)
+    }, PRODUCT_MEDIA_CAROUSEL_INTERVAL_MS)
+
+    return () => window.clearInterval(timer)
+  }, [slides.length])
 
   const goTo = useCallback(
     (index: number) => {
@@ -60,6 +41,11 @@ export function ProductGallery({ media, name }: ProductGalleryProps) {
     [slides.length],
   )
 
+  const activeSlide = slides[activeIndex]
+  const imageCount = slides.filter((slide) => !isProductVideo(slide)).length
+  const hasVideo = slides.some((slide) => isProductVideo(slide))
+  const coverImage = slides.find((slide) => !isProductVideo(slide))
+
   if (slides.length === 0) {
     return (
       <div className="flex aspect-square items-center justify-center rounded-2xl border border-border/60 bg-secondary/40">
@@ -69,72 +55,55 @@ export function ProductGallery({ media, name }: ProductGalleryProps) {
   }
 
   const activeImageIndex =
-    activeSlide?.kind === 'image'
-      ? slides.slice(0, activeIndex + 1).filter((slide) => slide.kind === 'image').length
+    activeSlide && !isProductVideo(activeSlide)
+      ? slides.slice(0, activeIndex + 1).filter((slide) => !isProductVideo(slide)).length
       : null
 
   return (
     <div className="space-y-3">
       <div className="group relative overflow-hidden rounded-2xl border border-border/60 bg-secondary/30">
-        <div
-          className={cn(
-            'relative w-full',
-            activeSlide?.kind === 'video' ? 'aspect-video bg-black' : 'aspect-square',
-          )}
-        >
-          {activeSlide?.kind === 'image' ? (
-            <img
-              key={activeSlide.item.id}
-              src={getMediaUrl(activeSlide.item, 1200)}
-              alt={activeSlide.item.alt || name}
-              className="size-full object-cover transition-opacity duration-300"
-            />
-          ) : activeSlide?.kind === 'video' ? (
-            <video
-              key={activeSlide.item.id}
-              src={activeSlide.item.url}
-              controls
-              playsInline
-              className="size-full object-contain"
-              preload="metadata"
+        <ProductMediaCarousel
+          media={slides}
+          alt={name}
+          imageWidth={1200}
+          aspectClassName="aspect-square"
+          activeIndex={activeIndex}
+          onActiveIndexChange={setActiveIndex}
+          autoPlay={false}
+        />
+
+        {activeSlide && !isProductVideo(activeSlide) && imageCount > 1 ? (
+          <span className="absolute top-3 right-3 z-20 rounded-full bg-background/90 px-2.5 py-1 text-xs font-medium tabular-nums shadow-soft backdrop-blur-sm">
+            {activeImageIndex} / {imageCount}
+          </span>
+        ) : null}
+
+        {activeSlide && isProductVideo(activeSlide) ? (
+          <span className="absolute top-3 right-3 z-20 rounded-full bg-background/90 px-2.5 py-1 text-xs font-medium shadow-soft backdrop-blur-sm">
+            Video
+          </span>
+        ) : null}
+
+        {slides.length > 1 ? (
+          <>
+            <button
+              type="button"
+              onClick={() => goTo(activeIndex - 1)}
+              className="absolute top-1/2 left-3 z-20 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/90 text-foreground opacity-0 shadow-soft transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+              aria-label="Previous media"
             >
-              Your browser does not support video playback.
-            </video>
-          ) : null}
-
-          {activeSlide?.kind === 'image' && imageCount > 1 ? (
-            <span className="absolute top-3 right-3 rounded-full bg-background/90 px-2.5 py-1 text-xs font-medium tabular-nums shadow-soft backdrop-blur-sm">
-              {activeImageIndex} / {imageCount}
-            </span>
-          ) : null}
-
-          {activeSlide?.kind === 'video' ? (
-            <span className="absolute top-3 right-3 rounded-full bg-background/90 px-2.5 py-1 text-xs font-medium shadow-soft backdrop-blur-sm">
-              Video
-            </span>
-          ) : null}
-
-          {slides.length > 1 ? (
-            <>
-              <button
-                type="button"
-                onClick={() => goTo(activeIndex - 1)}
-                className="absolute top-1/2 left-3 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/90 text-foreground opacity-0 shadow-soft transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
-                aria-label="Previous media"
-              >
-                <ChevronLeft className="size-5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => goTo(activeIndex + 1)}
-                className="absolute top-1/2 right-3 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/90 text-foreground opacity-0 shadow-soft transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
-                aria-label="Next media"
-              >
-                <ChevronRight className="size-5" />
-              </button>
-            </>
-          ) : null}
-        </div>
+              <ChevronLeft className="size-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => goTo(activeIndex + 1)}
+              className="absolute top-1/2 right-3 z-20 inline-flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/90 text-foreground opacity-0 shadow-soft transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+              aria-label="Next media"
+            >
+              <ChevronRight className="size-5" />
+            </button>
+          </>
+        ) : null}
       </div>
 
       {slides.length > 1 ? (
@@ -145,16 +114,16 @@ export function ProductGallery({ media, name }: ProductGalleryProps) {
         >
           {slides.map((slide, index) => {
             const selected = index === activeIndex
+            const isVideo = isProductVideo(slide)
+
             return (
               <button
-                key={slide.item.id}
+                key={slide.id}
                 type="button"
                 role="tab"
                 aria-selected={selected}
                 aria-label={
-                  slide.kind === 'video'
-                    ? `View product video`
-                    : `View image ${index + 1} of ${imageCount}`
+                  isVideo ? 'View product video' : `View image ${index + 1} of ${imageCount}`
                 }
                 onClick={() => setActiveIndex(index)}
                 className={cn(
@@ -164,9 +133,9 @@ export function ProductGallery({ media, name }: ProductGalleryProps) {
                     : 'border-transparent opacity-75 hover:opacity-100',
                 )}
               >
-                {slide.kind === 'image' ? (
+                {!isVideo ? (
                   <img
-                    src={getMediaUrl(slide.item, 160)}
+                    src={getMediaUrl(slide, 160)}
                     alt=""
                     className="size-full object-cover"
                   />

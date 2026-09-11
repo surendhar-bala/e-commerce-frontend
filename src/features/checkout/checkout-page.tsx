@@ -4,7 +4,7 @@ import { Link } from '@tanstack/react-router'
 
 import { Banknote, CreditCard, MapPin, ShieldCheck, Smartphone, User } from 'lucide-react'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 
 import { useForm } from 'react-hook-form'
 
@@ -13,6 +13,7 @@ import { z } from 'zod'
 import { toast } from 'sonner'
 
 import { EmptyState } from '@/components/common/empty-state'
+import { useCheckoutHeader } from '@/components/layout/checkout-layout'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
@@ -204,7 +205,7 @@ export function CheckoutPage() {
 
   const [placedOrderId, setPlacedOrderId] = useState<string | null>(null)
 
-
+  const { setHideBackToCart } = useCheckoutHeader()
 
   const formKey = useMemo(() => user?.id ?? 'guest', [user?.id])
 
@@ -229,6 +230,16 @@ export function CheckoutPage() {
     setServerError(null)
 
   }, [formKey, user, form])
+
+
+
+  useLayoutEffect(() => {
+
+    setHideBackToCart(Boolean(placedOrderId))
+
+    return () => setHideBackToCart(false)
+
+  }, [placedOrderId, setHideBackToCart])
 
 
 
@@ -264,11 +275,7 @@ export function CheckoutPage() {
 
               <Button asChild>
 
-                <Link to="/orders/$orderId" params={{ orderId: placedOrderId }}>
-
-                  View order
-
-                </Link>
+                <Link to="/orders">View orders</Link>
 
               </Button>
 
@@ -1062,13 +1069,6 @@ export function CheckoutPage() {
 
           </div>
 
-          <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
-
-            <ShieldCheck className="size-3.5 shrink-0" />
-
-            Secure payment · 7-day returns on eligible items
-
-          </p>
 
         </aside>
 

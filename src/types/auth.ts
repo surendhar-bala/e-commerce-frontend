@@ -24,6 +24,6 @@ export type ForgotPasswordPayload = {
 }
 
 export type ResetPasswordPayload = {
-  token: string
+  email: string
   password: string
 }
