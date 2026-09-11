@@ -24,13 +24,12 @@ export function ProductMediaCarousel({
   className,
   aspectClassName = 'aspect-square',
   activeIndex: controlledIndex,
-  onActiveIndexChange,
+  onActiveIndexChange: _onActiveIndexChange,
   autoPlay = true,
 }: ProductMediaCarouselProps) {
   const slides = useMemo(() => getProductMediaSlides(media), [media])
   const [internalIndex, setInternalIndex] = useState(0)
   const activeIndex = controlledIndex ?? internalIndex
-  const setActiveIndex = onActiveIndexChange ?? setInternalIndex
   const hasMultipleSlides = slides.length > 1
 
   useEffect(() => {
@@ -51,9 +50,12 @@ export function ProductMediaCarousel({
     return <div className={cn('bg-muted', aspectClassName, className)} />
   }
 
-  const slide = slides[0]
-
   if (!hasMultipleSlides) {
+    const slide = slides[0]
+    if (!slide) {
+      return <div className={cn('bg-muted', aspectClassName, className)} />
+    }
+
     return (
       <div className={cn('relative overflow-hidden', aspectClassName, className)}>
         {isProductVideo(slide) ? (

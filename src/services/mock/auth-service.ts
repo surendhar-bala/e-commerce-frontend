@@ -106,7 +106,11 @@ export const mockAuthService: AuthService = {
       throw new ServiceError('No account found with this email address.', 404, 'EMAIL_NOT_FOUND')
     }
 
-    accounts[index] = { ...accounts[index], password: payload.password }
+    const account = accounts[index]
+    if (!account) {
+      throw new ServiceError('No account found with this email address.', 404, 'EMAIL_NOT_FOUND')
+    }
+    accounts[index] = { ...account, password: payload.password }
     saveAccounts(accounts)
   },
 
