@@ -58,13 +58,25 @@ export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T
   }
 
   const token = getAccessToken()
+  const method = (init?.method ?? 'GET').toUpperCase()
+  const hasBody = init?.body != null
+  const headers = new Headers(init?.headers)
+
+  if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`)
+  }
+
+  if (hasBody && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json')
+  }
+
+  if (!hasBody && method === 'GET' && headers.has('Content-Type')) {
+    headers.delete('Content-Type')
+  }
+
   const response = await fetch(`${baseUrl}${path}`, {
     ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...init?.headers,
-    },
+    headers,
   })
 
   if (response.status === 204) {
